@@ -24,6 +24,7 @@ logs
 
 # Firebase
 .firebaserc
+.firebase
 # Service account (Firebase Admin SDK) — MUST NEVER be committed.
 # Download to ./service-account.json for local admin scripts, then delete.
 service-account.json
