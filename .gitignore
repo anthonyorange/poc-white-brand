@@ -1,6 +1,7 @@
 # Nuxt dev/build outputs
 .output
 .nitro
+.nuxt
 .cache
 dist
 
@@ -27,3 +28,6 @@ logs
 # Local files
 *.local
 
+
+# Symbiotic Security - Security Rules (auto-generated)
+.github/instructions/symbiotic_security_rules.instructions.md
