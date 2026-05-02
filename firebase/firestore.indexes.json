@@ -15,11 +15,6 @@
         { "fieldPath": "featured", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "products",
-      "queryScope": "COLLECTION",
-      "fields": [{ "fieldPath": "slug", "order": "ASCENDING" }]
     }
   ],
   "fieldOverrides": []
