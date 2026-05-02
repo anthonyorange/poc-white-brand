@@ -6,7 +6,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
-    '@nuxt/image',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
   ],
@@ -53,27 +52,12 @@ export default defineNuxtConfig({
     exclude: ['/admin/**'],
   },
 
-  // @nuxt/image: whitelist Firebase Storage + Google user content domains
-  // so <NuxtImg> can apply lazy-loading, responsive srcset, and format hints.
-  // We don't run an image CDN in this setup, but allowlisting is required by
-  // the module; actual serving still goes directly to Firebase Storage URLs.
-  //
-  // images.unsplash.com is included to let tools/seed-data.mjs populate a
-  // demo catalogue with stock photos. Remove it from this list once you
-  // replace seed images with your own Firebase Storage uploads (SYM-GR-0003,
-  // reduces the image-proxy SSRF surface).
-  image: {
-    domains: ['firebasestorage.googleapis.com', 'storage.googleapis.com', 'images.unsplash.com'],
-    format: ['webp', 'avif', 'jpeg'],
-    screens: {
-      xs: 320,
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      xxl: 1536,
-    },
-  },
+  // @nuxt/image was removed because:
+  //   1. We serve Firebase Storage URLs that IPX couldn't parse (signed tokens).
+  //   2. Sharp binaries bundled by @nuxt/image are platform-specific and break
+  //      Cloud Functions deploys cross-platform (builder on Windows → Linux runtime).
+  // If you need server-side image optimization later, prefer the Firebase
+  // Extension 'Resize Images' which creates sibling thumbnails on upload.
 
   nitro: {
     preset: 'firebase',
