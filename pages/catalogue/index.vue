@@ -26,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 import type { ProductCategory, Product } from '~/composables/useProducts'
 import { PRODUCTS_PAGE_SIZE } from '~/composables/useProducts'
 
@@ -49,30 +48,30 @@ const parseCategory = (raw: unknown): ProductCategory | 'all' =>
 
 const activeCategory = ref<ProductCategory | 'all'>(parseCategory(route.query.category))
 
-// SSR first page so crawlers see a populated grid. Re-runs when the category
-// changes (via watch below) — useAsyncData key is static but we reassign
-// products manually after filtering. Subsequent 'Voir plus' pages load lazily.
+// SSR first page so crawlers see a populated grid. The cursor we expose for
+// pagination is the doc ID (string) rather than a QueryDocumentSnapshot,
+// so the payload remains devalue-serializable across SSR → client.
 const { data: firstPage } = await useAsyncData(
   `catalogue-${activeCategory.value}`,
   async () => {
     try {
       const r =
         activeCategory.value === 'all' ? await getAll() : await getByCategory(activeCategory.value)
-      return { items: r.items, lastDocCount: r.items.length }
+      return { items: r.items, lastDocId: r.lastDocId }
     } catch {
-      return { items: [] as Product[], lastDocCount: 0 }
+      return { items: [] as Product[], lastDocId: null as string | null }
     }
   },
-  { default: () => ({ items: [] as Product[], lastDocCount: 0 }) },
+  { default: () => ({ items: [] as Product[], lastDocId: null as string | null }) },
 )
 
 const products = ref<Product[]>(firstPage.value.items)
 const loadingMore = ref(false)
-const lastDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
-const hasMore = ref(firstPage.value.lastDocCount === PRODUCTS_PAGE_SIZE)
+const lastDocId = ref<string | null>(firstPage.value.lastDocId)
+const hasMore = ref(firstPage.value.items.length === PRODUCTS_PAGE_SIZE)
 
 const fetchPage = async (reset: boolean) => {
-  const cursor = reset ? undefined : (lastDoc.value ?? undefined)
+  const cursor = reset ? undefined : (lastDocId.value ?? undefined)
   try {
     const result =
       activeCategory.value === 'all'
@@ -80,7 +79,7 @@ const fetchPage = async (reset: boolean) => {
         : await getByCategory(activeCategory.value, cursor)
     if (reset) products.value = result.items
     else products.value.push(...result.items)
-    lastDoc.value = result.lastDoc
+    lastDocId.value = result.lastDocId
     hasMore.value = result.items.length === PRODUCTS_PAGE_SIZE
   } catch {
     if (reset) products.value = []
@@ -98,7 +97,7 @@ const loadMore = async () => {
 // the initial category). Updates the URL query param.
 watch(activeCategory, async (cat) => {
   router.replace({ query: cat !== 'all' ? { category: cat } : {} })
-  lastDoc.value = null
+  lastDocId.value = null
   hasMore.value = false
   await fetchPage(true)
 })

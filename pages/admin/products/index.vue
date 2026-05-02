@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 import type { Product } from '~/composables/useProducts'
 import { PRODUCTS_PAGE_SIZE } from '~/composables/useProducts'
 
@@ -73,16 +72,16 @@ const { getAll, remove } = useProducts()
 const products = ref<Product[]>([])
 const loading = ref(true)
 const loadingMore = ref(false)
-const lastDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
+const lastDocId = ref<string | null>(null)
 const hasMore = ref(false)
 
 const fetchPage = async (reset: boolean) => {
-  const cursor = reset ? undefined : (lastDoc.value ?? undefined)
+  const cursor = reset ? undefined : (lastDocId.value ?? undefined)
   try {
     const r = await getAll(cursor)
     if (reset) products.value = r.items
     else products.value.push(...r.items)
-    lastDoc.value = r.lastDoc
+    lastDocId.value = r.lastDocId
     hasMore.value = r.items.length === PRODUCTS_PAGE_SIZE
   } catch {
     if (reset) products.value = []

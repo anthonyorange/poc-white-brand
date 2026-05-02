@@ -115,8 +115,23 @@ const upload = async (files: FileList) => {
     }
 
     emit('update:modelValue', [...props.modelValue, ...urls])
-  } catch {
-    error.value = "Échec de l'upload. Vérifiez votre connexion."
+  } catch (e) {
+    // Surface a more specific message when Storage rules deny the upload
+    // (common when the admin custom claim hasn't propagated to the client
+    // token yet, or when rules haven't been deployed). SYM-GR-0010: we keep
+    // the friendly message but the raw code is useful in dev.
+    const code = (e as { code?: string })?.code ?? ''
+    if (code === 'storage/unauthorized') {
+      error.value =
+        'Upload refusé par Firebase Storage. Déconnectez-vous et reconnectez-vous pour rafraîchir votre session admin, puis réessayez.'
+    } else if (code === 'storage/canceled') {
+      error.value = 'Upload annulé.'
+    } else if (code === 'storage/unknown') {
+      error.value = "Échec de l'upload (erreur inconnue). Vérifiez votre connexion."
+    } else {
+      error.value = "Échec de l'upload. Vérifiez votre connexion."
+    }
+    if (import.meta.dev) console.error('[ImageUploader] upload failed:', e)
   } finally {
     uploading.value = false
   }

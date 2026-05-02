@@ -12,6 +12,7 @@ import {
   orderBy,
   limit,
   startAfter,
+  Timestamp,
   type QueryDocumentSnapshot,
   type DocumentData,
   type QueryConstraint,
@@ -39,33 +40,90 @@ export const PRODUCTS_PAGE_SIZE = 12
 
 export interface PaginatedProducts {
   items: Product[]
-  lastDoc: QueryDocumentSnapshot<DocumentData> | null
+  // Use the doc ID (slug) as an opaque cursor for startAfter(), instead of
+  // returning a non-serializable QueryDocumentSnapshot. This keeps SSR
+  // payloads devalue-friendly.
+  lastDocId: string | null
+}
+
+/**
+ * Convert Firestore Timestamp fields on a raw product doc to JS Date objects.
+ * devalue (used by Nuxt useAsyncData payload transport) can serialize Date
+ * but not the Firestore Timestamp class — leaving it unchanged caused SSR
+ * to throw "Cannot stringify arbitrary non-POJOs" and silently returned
+ * empty lists on the client.
+ *
+ * SYM-GR-0010: annotated because the normalization also strips any
+ * unexpected prototype-carrying class instance the SDK might hand us.
+ */
+function normalizeProduct(raw: DocumentData & { id?: string }): Product {
+  const toDate = (v: unknown): Date | undefined => {
+    if (!v) return undefined
+    if (v instanceof Timestamp) return v.toDate()
+    if (v instanceof Date) return v
+    // Firestore JSON serialized form { seconds, nanoseconds }
+    if (
+      typeof v === 'object' &&
+      v !== null &&
+      'seconds' in (v as Record<string, unknown>) &&
+      typeof (v as { seconds: unknown }).seconds === 'number'
+    ) {
+      return new Date((v as { seconds: number }).seconds * 1000)
+    }
+    return undefined
+  }
+
+  return {
+    id: raw.id,
+    name: String(raw.name ?? ''),
+    slug: String(raw.slug ?? ''),
+    description: String(raw.description ?? ''),
+    price: Number(raw.price ?? 0),
+    stock: Number(raw.stock ?? 0),
+    category: raw.category as ProductCategory,
+    images: Array.isArray(raw.images) ? raw.images.map(String) : [],
+    featured: Boolean(raw.featured),
+    createdAt: toDate(raw.createdAt),
+    updatedAt: toDate(raw.updatedAt),
+  }
 }
 
 export const useProducts = () => {
   const db = useFirestore()
 
+  // Resolve an opaque cursor (doc ID) back to a snapshot for startAfter().
+  const resolveCursor = async (
+    cursorId: string,
+  ): Promise<QueryDocumentSnapshot<DocumentData> | null> => {
+    const s = await getDoc(doc(db, 'products', cursorId))
+    return s.exists() ? (s as unknown as QueryDocumentSnapshot<DocumentData>) : null
+  }
+
   /**
    * Fetch a page of products.
-   * @param cursor  last document from the previous page (for pagination)
+   * @param cursorId  doc id of the last item from the previous page
    * @param pageSize  number of items to fetch (default PRODUCTS_PAGE_SIZE)
    */
   const getAll = async (
-    cursor?: QueryDocumentSnapshot<DocumentData>,
+    cursorId?: string,
     pageSize: number = PRODUCTS_PAGE_SIZE,
   ): Promise<PaginatedProducts> => {
     const constraints: QueryConstraint[] = [orderBy('createdAt', 'desc'), limit(pageSize)]
-    if (cursor) constraints.push(startAfter(cursor))
+    if (cursorId) {
+      const cursor = await resolveCursor(cursorId)
+      if (cursor) constraints.push(startAfter(cursor))
+    }
     const snap = await getDocs(query(collection(db, 'products'), ...constraints))
+    const lastDoc = snap.docs.at(-1)
     return {
-      items: snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product),
-      lastDoc: snap.docs.at(-1) ?? null,
+      items: snap.docs.map((d) => normalizeProduct({ id: d.id, ...d.data() })),
+      lastDocId: lastDoc?.id ?? null,
     }
   }
 
   const getByCategory = async (
     cat: ProductCategory,
-    cursor?: QueryDocumentSnapshot<DocumentData>,
+    cursorId?: string,
     pageSize: number = PRODUCTS_PAGE_SIZE,
   ): Promise<PaginatedProducts> => {
     const constraints: QueryConstraint[] = [
@@ -73,11 +131,15 @@ export const useProducts = () => {
       orderBy('createdAt', 'desc'),
       limit(pageSize),
     ]
-    if (cursor) constraints.push(startAfter(cursor))
+    if (cursorId) {
+      const cursor = await resolveCursor(cursorId)
+      if (cursor) constraints.push(startAfter(cursor))
+    }
     const snap = await getDocs(query(collection(db, 'products'), ...constraints))
+    const lastDoc = snap.docs.at(-1)
     return {
-      items: snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product),
-      lastDoc: snap.docs.at(-1) ?? null,
+      items: snap.docs.map((d) => normalizeProduct({ id: d.id, ...d.data() })),
+      lastDocId: lastDoc?.id ?? null,
     }
   }
 
@@ -88,7 +150,7 @@ export const useProducts = () => {
    */
   const getBySlug = async (slug: string): Promise<Product | null> => {
     const snap = await getDoc(doc(db, 'products', slug))
-    return snap.exists() ? ({ id: snap.id, ...snap.data() } as Product) : null
+    return snap.exists() ? normalizeProduct({ id: snap.id, ...snap.data() }) : null
   }
 
   const getFeatured = async (max = 6): Promise<Product[]> => {
@@ -100,7 +162,7 @@ export const useProducts = () => {
         limit(max),
       ),
     )
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product)
+    return snap.docs.map((d) => normalizeProduct({ id: d.id, ...d.data() }))
   }
 
   /**
