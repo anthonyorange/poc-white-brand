@@ -1,5 +1,8 @@
 // composables/useAuth.ts
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, type User } from 'firebase/auth'
+// All firebase/auth imports are dynamic so the SDK is only downloaded when
+// the admin flow runs (login / init after navigation into /admin).
+// SYM-GR-0019 (minimum baseline: don't ship admin SDKs to public pages).
+import type { User } from 'firebase/auth'
 
 export const useAuth = () => {
   const user = useState<User | null>('auth-user', () => null)
@@ -8,8 +11,11 @@ export const useAuth = () => {
   // alongside Firestore rules. SYM-GR-0004 (least privilege).
   const isAdminClaim = useState<boolean>('auth-admin-claim', () => false)
 
-  const init = () => {
-    const auth = useFirebaseAuth()
+  const init = async () => {
+    const [auth, { onAuthStateChanged }] = await Promise.all([
+      useFirebaseAuth(),
+      import('firebase/auth'),
+    ])
     onAuthStateChanged(auth, async (u) => {
       user.value = u
       if (u) {
@@ -27,12 +33,18 @@ export const useAuth = () => {
   }
 
   const login = async (email: string, password: string) => {
-    const auth = useFirebaseAuth()
+    const [auth, { signInWithEmailAndPassword }] = await Promise.all([
+      useFirebaseAuth(),
+      import('firebase/auth'),
+    ])
     await signInWithEmailAndPassword(auth, email, password)
   }
 
   const logout = async () => {
-    const auth = useFirebaseAuth()
+    const [auth, { signOut }] = await Promise.all([
+      useFirebaseAuth(),
+      import('firebase/auth'),
+    ])
     await signOut(auth)
     await navigateTo('/admin/login')
   }

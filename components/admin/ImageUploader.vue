@@ -102,7 +102,7 @@ const upload = async (files: FileList) => {
 
   uploading.value = true
   try {
-    const storage = useFirebaseStorage()
+    const storage = await useFirebaseStorage()
     const urls: string[] = []
 
     for (const file of Array.from(files)) {
