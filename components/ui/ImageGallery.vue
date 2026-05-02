@@ -2,14 +2,14 @@
 <template>
   <div class="flex flex-col gap-3">
     <div class="aspect-square rounded-2xl overflow-hidden bg-surface">
-      <NuxtImg
+      <!-- Native <img> for Firebase Storage URLs — NuxtImg/IPX fails on
+           signed URLs with query params (alt=media&token=...). -->
+      <img
         :src="images[active]"
         :alt="alt"
         class="w-full h-full object-cover"
-        sizes="sm:100vw md:50vw lg:600px"
-        format="webp"
-        fit="cover"
         loading="eager"
+        decoding="async"
       />
     </div>
     <div
@@ -31,15 +31,14 @@
         ]"
         @click="active = i"
       >
-        <NuxtImg
+        <img
           :src="img"
-          :alt="''"
+          alt=""
           class="w-full h-full object-cover"
           width="64"
           height="64"
-          format="webp"
-          fit="cover"
           loading="lazy"
+          decoding="async"
         />
       </button>
     </div>

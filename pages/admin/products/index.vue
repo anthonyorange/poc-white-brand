@@ -10,15 +10,18 @@
 
     <ul class="divide-y divide-accent/20 list-none p-0">
       <li v-for="p in products" :key="p.id" class="flex items-center gap-4 py-4">
-        <NuxtImg
+        <!-- Native <img> for Firebase Storage URLs. NuxtImg would route the
+             request through IPX which fails on Firebase download URLs
+             (query-string + token). Since we control image size at upload,
+             re-encoding on the server isn't needed. -->
+        <img
           v-if="p.images[0]"
           :src="p.images[0]"
           :alt="p.name"
           width="56"
           height="56"
-          format="webp"
-          fit="cover"
           loading="lazy"
+          decoding="async"
           class="w-14 h-14 rounded-lg object-cover bg-surface"
         />
         <div v-else class="w-14 h-14 rounded-lg bg-surface" aria-hidden="true" />

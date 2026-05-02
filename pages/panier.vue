@@ -14,14 +14,13 @@
         :key="item.productId"
         class="flex items-center gap-4 py-4 border-b border-accent/20"
       >
-        <NuxtImg
+        <img
           :src="item.image"
           :alt="item.name"
           width="64"
           height="64"
-          format="webp"
-          fit="cover"
           loading="lazy"
+          decoding="async"
           class="w-16 h-16 rounded-xl object-cover bg-surface"
         />
         <div class="flex-1">

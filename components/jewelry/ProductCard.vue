@@ -7,15 +7,15 @@
   >
     <FloatWrapper>
       <div class="relative overflow-hidden rounded-2xl bg-surface aspect-square mb-3">
-        <NuxtImg
+        <!-- Native <img> for Firebase Storage URLs — see admin/products index
+             for the rationale. -->
+        <img
           v-if="product.images[0]"
           :src="product.images[0]"
           :alt="product.name"
           class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          sizes="sm:50vw md:33vw lg:25vw"
-          format="webp"
-          fit="cover"
+          decoding="async"
         />
         <div
           v-else
