@@ -1,0 +1,21 @@
+{
+  "cors": [
+    {
+      "origin": [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://atelieranais-cb8dd.web.app",
+        "https://atelieranais-cb8dd.firebaseapp.com"
+      ],
+      "method": ["GET", "PUT", "POST", "HEAD", "DELETE"],
+      "maxAgeSeconds": 3600,
+      "responseHeader": [
+        "Content-Type",
+        "Authorization",
+        "x-goog-meta-*",
+        "x-goog-resumable",
+        "x-firebase-storage-version"
+      ]
+    }
+  ]
+}

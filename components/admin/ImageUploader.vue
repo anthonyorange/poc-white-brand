@@ -25,9 +25,9 @@
       v-if="uploading"
       role="status"
       aria-live="polite"
-      class="text-xs font-body text-primary/60 text-center"
+      class="text-xs font-body text-primary/70 text-center"
     >
-      Upload en cours...
+      Upload en cours... ({{ pending.length }} fichier{{ pending.length > 1 ? 's' : '' }})
     </div>
     <p
       v-if="error"
@@ -38,9 +38,15 @@
       {{ error }}
     </p>
 
-    <ul v-if="modelValue.length" class="flex flex-wrap gap-2 list-none p-0">
-      <li v-for="(url, i) in modelValue" :key="url" class="relative w-20 h-20">
-        <img :src="url" :alt="`Image ${i + 1}`" class="w-full h-full object-cover rounded-lg" />
+    <ul v-if="modelValue.length || pending.length" class="flex flex-wrap gap-2 list-none p-0">
+      <!-- Persisted uploaded images -->
+      <li v-for="(url, i) in modelValue" :key="`ok-${url}`" class="relative w-20 h-20">
+        <img
+          :src="url"
+          :alt="`Image ${i + 1}`"
+          class="w-full h-full object-cover rounded-lg"
+          @error="onImgLoadError(url)"
+        />
         <button
           type="button"
           class="focus-ring absolute -top-2 -right-2 w-5 h-5 bg-primary text-white rounded-full text-xs flex items-center justify-center"
@@ -50,12 +56,30 @@
           <span aria-hidden="true">×</span>
         </button>
       </li>
+      <!-- Pending uploads (local blob preview) -->
+      <li
+        v-for="p in pending"
+        :key="`pending-${p.id}`"
+        class="relative w-20 h-20"
+        aria-label="Upload en cours"
+      >
+        <img
+          :src="p.blobUrl"
+          :alt="p.name"
+          class="w-full h-full object-cover rounded-lg opacity-50"
+        />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-white text-xs bg-black/60 px-2 py-0.5 rounded">
+            {{ p.progress }}%
+          </span>
+        </div>
+      </li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 
 const props = defineProps<{ modelValue: string[] }>()
 const emit = defineEmits<{ 'update:modelValue': [urls: string[]] }>()
@@ -66,9 +90,17 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MiB
 const MAX_IMAGES = 10
 
+interface PendingUpload {
+  id: string
+  name: string
+  blobUrl: string
+  progress: number
+}
+
 const fileInput = ref<HTMLInputElement>()
 const uploading = ref(false)
 const error = ref('')
+const pending = ref<PendingUpload[]>([])
 
 // Remove path traversal risk in filenames by keeping only basename + safe chars.
 const sanitizeFilename = (name: string): string => {
@@ -83,9 +115,29 @@ const validateFile = (file: File): string | null => {
   return null
 }
 
+// Map Firebase Storage error code → user message (SYM-GR-0010 curated).
+const storageErrorMessage = (code: string): string => {
+  switch (code) {
+    case 'storage/unauthorized':
+      return 'Upload refusé par Firebase Storage. Déconnectez-vous et reconnectez-vous pour rafraîchir votre session admin, puis réessayez.'
+    case 'storage/canceled':
+      return 'Upload annulé.'
+    case 'storage/retry-limit-exceeded':
+      return 'Trop de tentatives. Vérifiez votre connexion et la config CORS du bucket, puis réessayez.'
+    case 'storage/quota-exceeded':
+      return "Quota Storage dépassé — contactez l'administrateur Firebase."
+    case 'storage/unknown':
+      return "Échec de l'upload (erreur réseau ou CORS). Ouvrez la console navigateur pour les détails."
+    default:
+      return code
+        ? `Échec de l'upload (${code}). Vérifiez votre connexion et rechargez la page.`
+        : "Échec de l'upload. Vérifiez votre connexion."
+  }
+}
+
 const upload = async (files: FileList) => {
   error.value = ''
-  const currentCount = props.modelValue.length
+  const currentCount = props.modelValue.length + pending.value.length
   if (currentCount + files.length > MAX_IMAGES) {
     error.value = `Maximum ${MAX_IMAGES} images par produit.`
     return
@@ -101,47 +153,72 @@ const upload = async (files: FileList) => {
   }
 
   uploading.value = true
+
   try {
     const storage = await useFirebaseStorage()
-    const urls: string[] = []
+    const uploadedUrls: string[] = []
 
-    for (const file of Array.from(files)) {
-      const safeName = sanitizeFilename(file.name)
-      const path = `products/${Date.now()}-${crypto.randomUUID()}-${safeName}`
-      const snap = await uploadBytes(storageRef(storage, path), file, {
-        contentType: file.type,
-      })
-      urls.push(await getDownloadURL(snap.ref))
+    // Create local previews immediately (so admin sees *something* even if
+    // Storage is slow or fails). SYM-GR-0019 UX baseline.
+    const items: Array<PendingUpload & { file: File }> = Array.from(files).map((file) => ({
+      id: crypto.randomUUID(),
+      name: file.name,
+      blobUrl: URL.createObjectURL(file),
+      progress: 0,
+      file,
+    }))
+    // Push to `pending` without the File object (Vue reactivity doesn't need it).
+    for (const it of items) {
+      pending.value.push({ id: it.id, name: it.name, blobUrl: it.blobUrl, progress: 0 })
     }
 
-    emit('update:modelValue', [...props.modelValue, ...urls])
+    // Upload items sequentially to keep the UI feedback simple.
+    for (const item of items) {
+      try {
+        const safeName = sanitizeFilename(item.name)
+        const path = `products/${Date.now()}-${crypto.randomUUID()}-${safeName}`
+        const task = uploadBytesResumable(storageRef(storage, path), item.file, {
+          contentType: item.file.type,
+        })
+
+        // Live progress so the admin doesn't wonder if something is happening.
+        task.on('state_changed', (snap) => {
+          const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
+          const pendingItem = pending.value.find((p) => p.id === item.id)
+          if (pendingItem) pendingItem.progress = pct
+        })
+
+        const snap = await task
+        uploadedUrls.push(await getDownloadURL(snap.ref))
+      } finally {
+        URL.revokeObjectURL(item.blobUrl)
+        pending.value = pending.value.filter((p) => p.id !== item.id)
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      emit('update:modelValue', [...props.modelValue, ...uploadedUrls])
+    }
   } catch (e) {
-    // Surface a more specific message when Storage rules deny the upload
-    // (common when the admin custom claim hasn't propagated to the client
-    // token yet, or when rules haven't been deployed). SYM-GR-0010: we keep
-    // the friendly message but the raw code is useful in dev.
     const code = (e as { code?: string })?.code ?? ''
-    if (code === 'storage/unauthorized') {
-      error.value =
-        'Upload refusé par Firebase Storage. Déconnectez-vous et reconnectez-vous pour rafraîchir votre session admin, puis réessayez.'
-    } else if (code === 'storage/canceled') {
-      error.value = 'Upload annulé.'
-    } else if (code === 'storage/unknown') {
-      error.value = "Échec de l'upload (erreur inconnue). Vérifiez votre connexion."
-    } else {
-      error.value = "Échec de l'upload. Vérifiez votre connexion."
-    }
+    error.value = storageErrorMessage(code)
     if (import.meta.dev) console.error('[ImageUploader] upload failed:', e)
   } finally {
     uploading.value = false
   }
 }
 
+// Surface broken image URLs stored in Firestore (e.g. from a failed older
+// upload where only the URL was stored but Storage has no file).
+const onImgLoadError = (url: string) => {
+  if (import.meta.dev) console.warn('[ImageUploader] Image failed to load:', url)
+}
+
 const onFiles = (e: Event) => {
   const input = e.target as HTMLInputElement
   const files = input.files
   if (files && files.length > 0) upload(files)
-  // Reset so same file can be re-selected later
+  // Reset so the same file can be re-selected later.
   input.value = ''
 }
 

@@ -17,14 +17,14 @@
  *
  * Usage:
  *   node tools/deploy-rules.mjs                 # firestore rules + indexes
- *   node tools/deploy-rules.mjs --storage       # also storage rules
+ *   node tools/deploy-rules.mjs --storage       # also storage rules + CORS
  *   node tools/deploy-rules.mjs --firestore-only
  *   node tools/deploy-rules.mjs --skip-indexes
  *
  * Prerequisites:
  *   - service-account.json at the project root
  *   - firebase/firestore.rules, firebase/storage.rules,
- *     firebase/firestore.indexes.json
+ *     firebase/firestore.indexes.json, firebase/storage.cors.json
  */
 
 import { GoogleAuth } from 'google-auth-library'
@@ -210,6 +210,37 @@ async function deployIndexes() {
   }
 }
 
+/**
+ * Apply the CORS configuration to the Storage bucket so browser-based
+ * uploads (firebase/storage Web SDK) don't get blocked by same-origin.
+ *
+ * The config lives in firebase/storage.cors.json and is a deliberate
+ * allowlist of development + Firebase Hosting origins (SYM-GR-0005 TLS,
+ * SYM-GR-0019 baseline). No wildcard origin.
+ *
+ * API: https://cloud.google.com/storage/docs/configuring-cors
+ */
+async function deployStorageCors() {
+  const corsFile = 'firebase/storage.cors.json'
+  if (!existsSync(corsFile)) {
+    console.log(`\n(ℹ No ${corsFile} found — skipping CORS deploy.)`)
+    return
+  }
+  const parsed = JSON.parse(readFileSync(corsFile, 'utf-8'))
+  const wanted = Array.isArray(parsed.cors) ? parsed.cors : []
+
+  const bucket = `${projectId}.firebasestorage.app`
+  const url = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucket)}?fields=cors`
+
+  console.log(`\n— Applying CORS config to bucket ${bucket}...`)
+  await client.request({
+    url,
+    method: 'PATCH',
+    data: { cors: wanted },
+  })
+  console.log(`  ✓ CORS applied (${wanted.length} rule(s))`)
+}
+
 const main = async () => {
   if (!FIRESTORE_ONLY) {
     await deployRules('firebase/firestore.rules', 'cloud.firestore', 'Firestore')
@@ -226,6 +257,7 @@ const main = async () => {
       `firebase.storage/${bucket}`,
       `Storage bucket ${bucket}`,
     )
+    await deployStorageCors()
   }
 
   console.log('\n✨ Done.')
