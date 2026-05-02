@@ -55,6 +55,47 @@ the client (or call `getIdToken(true)` to force refresh). In this app,
 
 ---
 
+## `deploy-rules.mjs` — deploy Firestore & Storage rules
+
+The repo ships `firebase/firestore.rules` and `firebase/storage.rules`, but
+they don't apply to the project until they're uploaded. This script uses
+the `firebaserules.googleapis.com` REST API under your service account
+(same one as the other scripts), so you don't need to run `firebase login`
+or install the full Firebase CLI.
+
+### Deploy Firestore rules only (default)
+
+```bash
+node tools/deploy-rules.mjs
+```
+
+### Deploy both Firestore and Storage rules
+
+```bash
+node tools/deploy-rules.mjs --storage
+```
+
+### Storage rules only
+
+```bash
+node tools/deploy-rules.mjs --firestore-only --storage
+```
+
+The script creates a new `Ruleset` and updates the appropriate release
+(`cloud.firestore` for Firestore, `firebase.storage/<bucket>` for Storage).
+Previous rulesets remain in the project's history and can be rolled back
+via the Firebase Console if needed.
+
+### Why not `firebase deploy`?
+
+The Firebase CLI requires `roles/serviceusage.serviceUsageConsumer` on
+the service account to pre-flight check API activation. The default
+`firebase-adminsdk` service account doesn't have it. Calling the rules
+API directly only needs `roles/firebaserules.admin`, which
+`firebase-adminsdk` does have.
+
+---
+
 ## `seed-data.mjs` — pre-populate Firestore
 
 Populates Firestore with a default `config/brand` document and 8 sample
