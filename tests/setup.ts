@@ -1,34 +1,39 @@
 // tests/setup.ts
 import { vi } from 'vitest'
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 
 // Expose Nuxt auto-imports as globals for the test environment
 // so composables that rely on them work without a full Nuxt runtime.
-const globalState = new Map<string, any>()
+const globalState = new Map<string, Ref<unknown>>()
 
-const useState = <T>(key: string, init?: () => T) => {
+const useState = <T>(key: string, init?: () => T): Ref<T> => {
   if (!globalState.has(key)) {
-    globalState.set(key, ref(init ? init() : undefined))
+    globalState.set(key, ref(init ? init() : undefined) as Ref<unknown>)
   }
-  return globalState.get(key)
+  return globalState.get(key) as Ref<T>
 }
 
 const useNuxtApp = () => ({ $firebase: { db: {}, auth: {}, storage: {} } })
 const useRuntimeConfig = () => ({ public: { firebase: {} } })
 const navigateTo = vi.fn()
 
-// @ts-expect-error expose globally for composables
-globalThis.useState = useState
-// @ts-expect-error
-globalThis.useNuxtApp = useNuxtApp
-// @ts-expect-error
-globalThis.useRuntimeConfig = useRuntimeConfig
-// @ts-expect-error
-globalThis.navigateTo = navigateTo
-// @ts-expect-error
-globalThis.computed = computed
-// @ts-expect-error
-globalThis.ref = ref
+// Expose Nuxt helpers as globals for composables that rely on auto-imports.
+// Using `unknown` cast + dedicated globalThis typing instead of @ts-expect-error.
+type GlobalNuxt = typeof globalThis & {
+  useState: typeof useState
+  useNuxtApp: typeof useNuxtApp
+  useRuntimeConfig: typeof useRuntimeConfig
+  navigateTo: typeof navigateTo
+  computed: typeof computed
+  ref: typeof ref
+}
+const g = globalThis as GlobalNuxt
+g.useState = useState
+g.useNuxtApp = useNuxtApp
+g.useRuntimeConfig = useRuntimeConfig
+g.navigateTo = navigateTo
+g.computed = computed
+g.ref = ref
 
 // Also mock the #app module for any import references
 vi.mock('#app', () => ({

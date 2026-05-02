@@ -19,17 +19,21 @@
       @change="onFiles"
     />
 
-    <div v-if="uploading" class="text-xs font-body text-primary/50 text-center">Upload en cours...</div>
+    <div v-if="uploading" class="text-xs font-body text-primary/50 text-center">
+      Upload en cours...
+    </div>
     <p v-if="error" class="text-xs font-body text-red-400 text-center">{{ error }}</p>
 
     <div v-if="modelValue.length" class="flex flex-wrap gap-2">
       <div v-for="(url, i) in modelValue" :key="url" class="relative w-20 h-20">
-        <img :src="url" :alt="`Image ${i+1}`" class="w-full h-full object-cover rounded-lg" />
+        <img :src="url" :alt="`Image ${i + 1}`" class="w-full h-full object-cover rounded-lg" />
         <button
           type="button"
           class="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white rounded-full text-xs flex items-center justify-center"
           @click="removeImage(i)"
-        >×</button>
+        >
+          ×
+        </button>
       </div>
     </div>
   </div>

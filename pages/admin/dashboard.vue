@@ -9,8 +9,12 @@
       <StatsCard label="Commandes" value="—" sub="phase 2" />
     </div>
     <div class="flex gap-3">
-      <AppButton variant="outline" @click="navigateTo('/admin/products/new')">+ Nouveau produit</AppButton>
-      <AppButton variant="ghost" @click="navigateTo('/admin/messages')">Voir les messages</AppButton>
+      <AppButton variant="outline" @click="navigateTo('/admin/products/new')"
+        >+ Nouveau produit</AppButton
+      >
+      <AppButton variant="ghost" @click="navigateTo('/admin/messages')"
+        >Voir les messages</AppButton
+      >
     </div>
   </div>
 </template>

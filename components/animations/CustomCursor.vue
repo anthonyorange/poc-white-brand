@@ -30,7 +30,8 @@ onUnmounted(() => {
 <style scoped>
 .custom-cursor {
   position: fixed;
-  width: 20px; height: 20px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--color-accent), var(--color-primary));
   opacity: 0.5;
@@ -42,5 +43,9 @@ onUnmounted(() => {
   animation: cursor-pulse 2s ease-in-out infinite;
 }
 
-@media (pointer: coarse) { .custom-cursor { display: none; } }
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+}
 </style>

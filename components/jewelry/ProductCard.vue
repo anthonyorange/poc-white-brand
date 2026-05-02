@@ -10,11 +10,14 @@
           class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        <div v-else class="w-full h-full flex items-center justify-center text-primary/20 text-4xl">◇</div>
+        <div v-else class="w-full h-full flex items-center justify-center text-primary/20 text-4xl">
+          ◇
+        </div>
         <span
           v-if="product.stock === 0"
           class="absolute top-3 right-3 bg-white/90 text-primary/60 text-xs px-2 py-1 rounded-full font-body"
-        >Épuisé</span>
+          >Épuisé</span
+        >
       </div>
     </FloatWrapper>
     <h3 class="font-heading text-primary text-lg leading-tight">{{ product.name }}</h3>

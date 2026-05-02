@@ -2,7 +2,9 @@
 <template>
   <form class="space-y-6 max-w-lg" @submit.prevent="save">
     <div v-for="field in fields" :key="field.key">
-      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">{{ field.label }}</label>
+      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">{{
+        field.label
+      }}</label>
       <input
         v-model="form[field.key as keyof typeof form]"
         :type="field.type ?? 'text'"
@@ -12,8 +14,14 @@
     </div>
 
     <div>
-      <p class="font-body text-xs text-primary/50 uppercase tracking-wider mb-2">Couleur principale</p>
-      <input v-model="form.primaryColor" type="color" class="w-10 h-10 cursor-pointer rounded border-0" />
+      <p class="font-body text-xs text-primary/50 uppercase tracking-wider mb-2">
+        Couleur principale
+      </p>
+      <input
+        v-model="form.primaryColor"
+        type="color"
+        class="w-10 h-10 cursor-pointer rounded border-0"
+      />
     </div>
 
     <p v-if="error" class="font-body text-sm text-red-400">{{ error }}</p>
@@ -32,23 +40,24 @@ const saved = ref(false)
 const error = ref('')
 
 const form = reactive({
-  name:         config.value.name,
-  slogan:       config.value.slogan,
-  heroTitle:    config.value.texts.heroTitle,
+  name: config.value.name,
+  slogan: config.value.slogan,
+  heroTitle: config.value.texts.heroTitle,
   heroSubtitle: config.value.texts.heroSubtitle,
   aboutSummary: config.value.texts.aboutSummary,
-  instagram:    config.value.social.instagram,
+  instagram: config.value.social.instagram,
   primaryColor: config.value.colors.primary,
 })
 
-const fields: Array<{ key: keyof typeof form; label: string; type?: string; maxlength?: number }> = [
-  { key: 'name',         label: 'Nom de la marque', maxlength: 80 },
-  { key: 'slogan',       label: 'Slogan', maxlength: 120 },
-  { key: 'heroTitle',    label: 'Titre du héros', maxlength: 120 },
-  { key: 'heroSubtitle', label: 'Sous-titre du héros', maxlength: 240 },
-  { key: 'aboutSummary', label: 'Présentation créatrice', maxlength: 600 },
-  { key: 'instagram',    label: 'Compte Instagram (handle sans @)', maxlength: 40 },
-]
+const fields: Array<{ key: keyof typeof form; label: string; type?: string; maxlength?: number }> =
+  [
+    { key: 'name', label: 'Nom de la marque', maxlength: 80 },
+    { key: 'slogan', label: 'Slogan', maxlength: 120 },
+    { key: 'heroTitle', label: 'Titre du héros', maxlength: 120 },
+    { key: 'heroSubtitle', label: 'Sous-titre du héros', maxlength: 240 },
+    { key: 'aboutSummary', label: 'Présentation créatrice', maxlength: 600 },
+    { key: 'instagram', label: 'Compte Instagram (handle sans @)', maxlength: 40 },
+  ]
 
 // Validate constrained shapes. SYM-GR-0003.
 const HANDLE_RE = /^[A-Za-z0-9._-]{0,40}$/
@@ -83,7 +92,9 @@ const save = async () => {
     })
     document.documentElement.style.setProperty('--color-primary', form.primaryColor)
     saved.value = true
-    setTimeout(() => { saved.value = false }, 3000)
+    setTimeout(() => {
+      saved.value = false
+    }, 3000)
   } catch {
     error.value = 'Impossible de sauvegarder.'
   } finally {

@@ -1,0 +1,9 @@
+.nuxt
+.output
+.nitro
+.cache
+dist
+node_modules
+package-lock.json
+*.md
+.superpowers

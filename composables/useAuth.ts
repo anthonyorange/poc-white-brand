@@ -1,10 +1,5 @@
 // composables/useAuth.ts
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  type User,
-} from 'firebase/auth'
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, type User } from 'firebase/auth'
 
 export const useAuth = () => {
   const user = useState<User | null>('auth-user', () => null)

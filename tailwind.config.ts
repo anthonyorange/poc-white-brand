@@ -12,15 +12,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary:    'var(--color-primary)',
-        secondary:  'var(--color-secondary)',
-        accent:     'var(--color-accent)',
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        accent: 'var(--color-accent)',
         background: 'var(--color-background)',
-        surface:    'var(--color-surface)',
+        surface: 'var(--color-surface)',
       },
       fontFamily: {
         heading: ['var(--font-heading)'],
-        body:    ['var(--font-body)'],
+        body: ['var(--font-body)'],
       },
     },
   },

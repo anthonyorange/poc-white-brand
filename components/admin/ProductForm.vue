@@ -2,7 +2,9 @@
 <template>
   <form class="space-y-5 max-w-xl" @submit.prevent="onSubmit">
     <div>
-      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">Nom</label>
+      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1"
+        >Nom</label
+      >
       <input
         v-model="form.name"
         required
@@ -13,7 +15,9 @@
     </div>
 
     <div>
-      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">Slug URL</label>
+      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1"
+        >Slug URL</label
+      >
       <input
         v-model="form.slug"
         required
@@ -21,12 +25,16 @@
         pattern="[a-z0-9-]+"
         class="w-full border border-accent/40 rounded-xl px-4 py-3 font-body text-sm bg-surface/50 outline-none focus:border-primary"
       />
-      <p class="text-xs font-body text-primary/30 mt-1">Lettres minuscules, chiffres et tirets uniquement.</p>
+      <p class="text-xs font-body text-primary/30 mt-1">
+        Lettres minuscules, chiffres et tirets uniquement.
+      </p>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">Prix (€)</label>
+        <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1"
+          >Prix (€)</label
+        >
         <input
           v-model.number="form.price"
           type="number"
@@ -38,7 +46,9 @@
         />
       </div>
       <div>
-        <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">Stock</label>
+        <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1"
+          >Stock</label
+        >
         <input
           v-model.number="form.stock"
           type="number"
@@ -51,7 +61,9 @@
     </div>
 
     <div>
-      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">Catégorie</label>
+      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1"
+        >Catégorie</label
+      >
       <select
         v-model="form.category"
         required
@@ -65,7 +77,9 @@
     </div>
 
     <div>
-      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1">Description</label>
+      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-1"
+        >Description</label
+      >
       <textarea
         v-model="form.description"
         rows="4"
@@ -76,7 +90,9 @@
     </div>
 
     <div>
-      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-2">Photos</label>
+      <label class="font-body text-xs text-primary/50 uppercase tracking-wider block mb-2"
+        >Photos</label
+      >
       <ImageUploader v-model="form.images" />
     </div>
 
@@ -117,13 +133,14 @@ const form = reactive<Omit<Product, 'id'>>({
 const error = ref('')
 
 const slugify = (s: string): string =>
-  s.toLowerCase()
-   .normalize('NFD')
-   // Strip diacritics
-   .replace(/\p{Diacritic}+/gu, '')
-   .replace(/[^a-z0-9]+/g, '-')
-   .replace(/^-+|-+$/g, '')
-   .slice(0, 120)
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    // Strip diacritics
+    .replace(/\p{Diacritic}+/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 120)
 
 const autoSlug = () => {
   // Only auto-fill slug if user hasn't provided an explicit one originally

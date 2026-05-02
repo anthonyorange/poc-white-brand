@@ -9,7 +9,7 @@ describe('mergeBrandConfig', () => {
     expect(result.colors.primary).toBe('#6b4c7a')
   })
 
-  it('écrase les champs fournis dans l\'override', () => {
+  it("écrase les champs fournis dans l'override", () => {
     const result = mergeBrandConfig({ name: 'Autre Marque' })
     expect(result.name).toBe('Autre Marque')
     expect(result.colors.primary).toBe('#6b4c7a')

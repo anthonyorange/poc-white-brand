@@ -7,11 +7,10 @@
 
 <script setup lang="ts">
 const el = ref<HTMLElement>()
-const nuxtApp = useNuxtApp() as any
+const { $gsap, $ScrollTrigger } = useNuxtApp()
 
 onMounted(() => {
   if (!el.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const $gsap = nuxtApp.$gsap
   if (!$gsap) return
   $gsap.from(el.value, {
     opacity: 0,
@@ -27,7 +26,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  const $ScrollTrigger = nuxtApp.$ScrollTrigger
-  $ScrollTrigger?.getAll().forEach((t: any) => t.kill())
+  $ScrollTrigger?.getAll().forEach((t) => t.kill())
 })
 </script>

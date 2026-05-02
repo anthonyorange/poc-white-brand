@@ -5,14 +5,16 @@ import { getAuth } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
 export default defineNuxtPlugin(() => {
-  const { public: { firebase: cfg } } = useRuntimeConfig()
+  const {
+    public: { firebase: cfg },
+  } = useRuntimeConfig()
   const app = getApps().length === 0 ? initializeApp(cfg) : getApps()[0]
   return {
     provide: {
       firebase: {
         app,
-        db:      getFirestore(app),
-        auth:    getAuth(app),
+        db: getFirestore(app),
+        auth: getAuth(app),
         storage: getStorage(app),
       },
     },

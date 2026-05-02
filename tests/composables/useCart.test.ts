@@ -6,7 +6,9 @@ import { __clearGlobalState } from '../setup'
 const store: Record<string, string> = {}
 vi.stubGlobal('localStorage', {
   getItem: (k: string) => store[k] ?? null,
-  setItem: (k: string, v: string) => { store[k] = v },
+  setItem: (k: string, v: string) => {
+    store[k] = v
+  },
 })
 
 const { useCart } = await import('~/composables/useCart')

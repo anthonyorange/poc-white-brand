@@ -6,7 +6,9 @@
       <div class="relative z-10 max-w-2xl mx-auto text-center">
         <RevealOnScroll>
           <h1 class="font-heading text-6xl text-primary mb-6">La Créatrice</h1>
-          <p class="font-body text-primary/60 leading-relaxed text-lg">{{ brand.config.value.texts.aboutSummary }}</p>
+          <p class="font-body text-primary/60 leading-relaxed text-lg">
+            {{ brand.config.value.texts.aboutSummary }}
+          </p>
         </RevealOnScroll>
       </div>
     </section>
@@ -19,8 +21,8 @@
         <h2 class="font-heading text-3xl text-primary mb-6">Mon atelier, mon univers</h2>
         <p class="font-body text-primary/60 leading-relaxed">
           Chaque bijou naît d'une intention, d'une matière qui me parle, d'un geste répété jusqu'à
-          la perfection. Je travaille avec des métaux précieux et des pierres naturelles,
-          en petites séries ou en pièces uniques.
+          la perfection. Je travaille avec des métaux précieux et des pierres naturelles, en petites
+          séries ou en pièces uniques.
         </p>
       </RevealOnScroll>
     </section>

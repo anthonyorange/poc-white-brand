@@ -1,6 +1,8 @@
 <!-- components/layout/AppHeader.vue -->
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between backdrop-blur-sm bg-background/80 border-b border-accent/20">
+  <header
+    class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between backdrop-blur-sm bg-background/80 border-b border-accent/20"
+  >
     <NuxtLink to="/" class="font-heading text-xl text-primary tracking-widest">
       {{ brand.config.value.name }}
     </NuxtLink>
@@ -16,7 +18,8 @@
       <span
         v-if="cart.count.value > 0"
         class="absolute -top-2 -right-4 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
-      >{{ cart.count.value }}</span>
+        >{{ cart.count.value }}</span
+      >
     </NuxtLink>
   </header>
 </template>

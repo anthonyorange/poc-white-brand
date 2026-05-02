@@ -9,7 +9,10 @@
         v-for="(img, i) in images"
         :key="i"
         type="button"
-        :class="['w-16 h-16 rounded-lg overflow-hidden border-2 transition-all', active === i ? 'border-primary' : 'border-transparent opacity-60']"
+        :class="[
+          'w-16 h-16 rounded-lg overflow-hidden border-2 transition-all',
+          active === i ? 'border-primary' : 'border-transparent opacity-60',
+        ]"
         @click="active = i"
       >
         <img :src="img" :alt="`${alt} ${i + 1}`" class="w-full h-full object-cover" />

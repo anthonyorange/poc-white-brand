@@ -3,7 +3,9 @@
   <div class="max-w-lg mx-auto px-6 py-24">
     <RevealOnScroll>
       <h1 class="font-heading text-5xl text-primary text-center mb-4">Contact</h1>
-      <p class="font-body text-primary/50 text-center mb-12">Une question, une commande sur mesure ?</p>
+      <p class="font-body text-primary/50 text-center mb-12">
+        Une question, une commande sur mesure ?
+      </p>
     </RevealOnScroll>
 
     <form v-if="!sent" class="flex flex-col gap-5" @submit.prevent="submit">
@@ -37,7 +39,8 @@
         {{ loading ? 'Envoi...' : 'Envoyer' }}
       </AppButton>
       <p class="text-center font-body text-xs text-primary/30">
-        En envoyant ce formulaire, vous acceptez que votre email soit utilisé uniquement pour vous répondre (SYM-GR-0003).
+        En envoyant ce formulaire, vous acceptez que votre email soit utilisé uniquement pour vous
+        répondre (SYM-GR-0003).
       </p>
     </form>
 

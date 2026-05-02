@@ -32,7 +32,8 @@ export const defaultBrandConfig: BrandConfig = {
   texts: {
     heroTitle: 'Des bijoux nés de mes mains',
     heroSubtitle: 'Chaque pièce est unique, créée avec intention',
-    aboutSummary: "Anaïs crée des bijoux d'auteure depuis 2018, à partir de matériaux soigneusement sélectionnés.",
+    aboutSummary:
+      "Anaïs crée des bijoux d'auteure depuis 2018, à partir de matériaux soigneusement sélectionnés.",
   },
   adminEmail: '',
 }

@@ -14,7 +14,11 @@
         :key="item.productId"
         class="flex items-center gap-4 py-4 border-b border-accent/20"
       >
-        <img :src="item.image" :alt="item.name" class="w-16 h-16 rounded-xl object-cover bg-surface" />
+        <img
+          :src="item.image"
+          :alt="item.name"
+          class="w-16 h-16 rounded-xl object-cover bg-surface"
+        />
         <div class="flex-1">
           <p class="font-body text-primary font-medium">{{ item.name }}</p>
           <p class="font-body text-primary/50 text-sm">{{ item.price }} €</p>
@@ -24,19 +28,25 @@
             type="button"
             class="w-7 h-7 rounded-full border border-primary/20 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors"
             @click="cart.updateQuantity(item.productId, item.quantity - 1)"
-          >−</button>
+          >
+            −
+          </button>
           <span class="font-body text-sm w-4 text-center">{{ item.quantity }}</span>
           <button
             type="button"
             class="w-7 h-7 rounded-full border border-primary/20 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors"
             @click="cart.updateQuantity(item.productId, item.quantity + 1)"
-          >+</button>
+          >
+            +
+          </button>
         </div>
         <button
           type="button"
           class="text-primary/30 hover:text-primary/70 text-lg ml-2"
           @click="cart.remove(item.productId)"
-        >×</button>
+        >
+          ×
+        </button>
       </div>
 
       <div class="flex justify-between items-center mt-8 pt-4">
@@ -47,7 +57,9 @@
       <AppButton variant="primary" class="w-full mt-6" disabled>
         Passer commande (bientôt disponible)
       </AppButton>
-      <p class="text-center font-body text-xs text-primary/30 mt-3">Paiement Stripe disponible prochainement</p>
+      <p class="text-center font-body text-xs text-primary/30 mt-3">
+        Paiement Stripe disponible prochainement
+      </p>
     </div>
   </div>
 </template>

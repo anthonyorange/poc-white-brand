@@ -1,7 +1,14 @@
 // composables/useProducts.ts
 import {
-  collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
-  query, where, orderBy,
+  collection,
+  doc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
 } from 'firebase/firestore'
 
 export type ProductCategory = 'bagues' | 'colliers' | 'bracelets' | 'boucles'
@@ -25,12 +32,14 @@ export const useProducts = () => {
 
   const getAll = async (): Promise<Product[]> => {
     const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')))
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product)
   }
 
   const getByCategory = async (cat: ProductCategory): Promise<Product[]> => {
-    const snap = await getDocs(query(collection(db, 'products'), where('category', '==', cat), orderBy('createdAt', 'desc')))
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
+    const snap = await getDocs(
+      query(collection(db, 'products'), where('category', '==', cat), orderBy('createdAt', 'desc')),
+    )
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product)
   }
 
   const getBySlug = async (slug: string): Promise<Product | null> => {
@@ -42,11 +51,15 @@ export const useProducts = () => {
 
   const getFeatured = async (): Promise<Product[]> => {
     const snap = await getDocs(query(collection(db, 'products'), where('featured', '==', true)))
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product)
   }
 
   const create = async (product: Omit<Product, 'id'>): Promise<string> => {
-    const ref = await addDoc(collection(db, 'products'), { ...product, createdAt: new Date(), updatedAt: new Date() })
+    const ref = await addDoc(collection(db, 'products'), {
+      ...product,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
     return ref.id
   }
 

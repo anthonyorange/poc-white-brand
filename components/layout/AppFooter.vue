@@ -11,17 +11,21 @@
           target="_blank"
           rel="noopener noreferrer"
           class="hover:text-primary transition-colors"
-        >Instagram</a>
+          >Instagram</a
+        >
         <a
           v-if="fbHandle"
           :href="`https://facebook.com/${fbHandle}`"
           target="_blank"
           rel="noopener noreferrer"
           class="hover:text-primary transition-colors"
-        >Facebook</a>
+          >Facebook</a
+        >
       </div>
     </div>
-    <p class="text-center font-body text-xs text-primary/30 mt-8">© {{ new Date().getFullYear() }} {{ brand.config.value.name }}</p>
+    <p class="text-center font-body text-xs text-primary/30 mt-8">
+      © {{ new Date().getFullYear() }} {{ brand.config.value.name }}
+    </p>
   </footer>
 </template>
 
@@ -30,7 +34,7 @@ const brand = useBrand()
 
 // Sanitize social handles to prevent injection via brand config
 // (SYM-GR-0003: only allow expected handle shape [A-Za-z0-9._-])
-const safeHandle = (h: string) => /^[A-Za-z0-9._-]{1,40}$/.test(h) ? h : ''
+const safeHandle = (h: string) => (/^[A-Za-z0-9._-]{1,40}$/.test(h) ? h : '')
 
 const igHandle = computed(() => safeHandle(brand.config.value.social.instagram))
 const fbHandle = computed(() => safeHandle(brand.config.value.social.facebook))

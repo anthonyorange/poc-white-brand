@@ -3,7 +3,9 @@
   <div>
     <div class="flex justify-between items-center mb-8">
       <h1 class="font-heading text-3xl text-primary">Produits</h1>
-      <AppButton variant="primary" @click="navigateTo('/admin/products/new')">+ Nouveau produit</AppButton>
+      <AppButton variant="primary" @click="navigateTo('/admin/products/new')"
+        >+ Nouveau produit</AppButton
+      >
     </div>
 
     <div class="divide-y divide-accent/20">
@@ -22,16 +24,21 @@
         <span
           v-if="p.featured"
           class="text-xs font-body text-primary/40 border border-primary/20 rounded-full px-2 py-0.5"
-        >Featured</span>
+          >Featured</span
+        >
         <span :class="p.stock > 0 ? 'text-green-500' : 'text-red-400'" class="text-xs font-body">
           {{ p.stock > 0 ? `${p.stock} en stock` : 'Épuisé' }}
         </span>
-        <AppButton variant="ghost" @click="navigateTo(`/admin/products/${p.id}`)">Modifier</AppButton>
+        <AppButton variant="ghost" @click="navigateTo(`/admin/products/${p.id}`)"
+          >Modifier</AppButton
+        >
         <button
           type="button"
           class="text-primary/30 hover:text-red-400 transition-colors font-body text-sm"
           @click="deleteProduct(p.id!)"
-        >Supprimer</button>
+        >
+          Supprimer
+        </button>
       </div>
     </div>
 
@@ -59,7 +66,7 @@ const deleteProduct = async (id: string) => {
   if (!confirm('Supprimer ce produit ?')) return
   try {
     await remove(id)
-    products.value = products.value.filter(p => p.id !== id)
+    products.value = products.value.filter((p) => p.id !== id)
   } catch {
     // swallow: Firestore rules enforce authz; UI doesn't need to expose details
   }
