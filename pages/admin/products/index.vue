@@ -10,31 +10,38 @@
 
     <div class="divide-y divide-accent/20">
       <div v-for="p in products" :key="p.id" class="flex items-center gap-4 py-4">
-        <img
+        <NuxtImg
           v-if="p.images[0]"
           :src="p.images[0]"
           :alt="p.name"
+          width="56"
+          height="56"
+          format="webp"
+          fit="cover"
+          loading="lazy"
           class="w-14 h-14 rounded-lg object-cover bg-surface"
         />
-        <div v-else class="w-14 h-14 rounded-lg bg-surface" />
+        <div v-else class="w-14 h-14 rounded-lg bg-surface" aria-hidden="true" />
         <div class="flex-1">
           <p class="font-body text-primary font-medium">{{ p.name }}</p>
-          <p class="font-body text-sm text-primary/40">{{ p.category }} · {{ p.price }} €</p>
+          <p class="font-body text-sm text-primary/60">{{ p.category }} · {{ p.price }} €</p>
         </div>
         <span
           v-if="p.featured"
-          class="text-xs font-body text-primary/40 border border-primary/20 rounded-full px-2 py-0.5"
-          >Featured</span
+          class="text-xs font-body text-primary/60 border border-primary/30 rounded-full px-2 py-0.5"
         >
-        <span :class="p.stock > 0 ? 'text-green-500' : 'text-red-400'" class="text-xs font-body">
+          Featured
+        </span>
+        <span :class="p.stock > 0 ? 'text-green-600' : 'text-red-500'" class="text-xs font-body">
           {{ p.stock > 0 ? `${p.stock} en stock` : 'Épuisé' }}
         </span>
-        <AppButton variant="ghost" @click="navigateTo(`/admin/products/${p.id}`)"
-          >Modifier</AppButton
-        >
+        <AppButton variant="ghost" @click="navigateTo(`/admin/products/${p.id}`)">
+          Modifier
+        </AppButton>
         <button
           type="button"
-          class="text-primary/30 hover:text-red-400 transition-colors font-body text-sm"
+          class="focus-ring rounded text-primary/50 hover:text-red-500 transition-colors font-body text-sm"
+          :aria-label="`Supprimer ${p.name}`"
           @click="deleteProduct(p.id!)"
         >
           Supprimer

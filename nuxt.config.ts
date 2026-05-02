@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
+    '@nuxt/image',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
   ],
@@ -42,6 +43,23 @@ export default defineNuxtConfig({
   // via a server handler that queries Firestore at build time.
   sitemap: {
     exclude: ['/admin/**'],
+  },
+
+  // @nuxt/image: whitelist Firebase Storage + Google user content domains
+  // so <NuxtImg> can apply lazy-loading, responsive srcset, and format hints.
+  // We don't run an image CDN in this setup, but allowlisting is required by
+  // the module; actual serving still goes directly to Firebase Storage URLs.
+  image: {
+    domains: ['firebasestorage.googleapis.com', 'storage.googleapis.com'],
+    format: ['webp', 'avif', 'jpeg'],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
   },
 
   nitro: {
