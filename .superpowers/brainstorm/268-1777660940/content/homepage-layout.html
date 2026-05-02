@@ -1,0 +1,86 @@
+<h2>Quelle structure pour la page d'accueil ?</h2>
+<p class="subtitle">Le layout définit comment tes visiteurs découvrent tes bijoux pour la première fois</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="hero-immersif" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(160deg,#f8e8f5,#e8f0f8); height:200px; padding:12px; display:flex; flex-direction:column; gap:6px;">
+      <!-- Nav -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0 6px;">
+        <div style="font-size:9px; color:#6b4c7a; letter-spacing:2px;">ÉCLAT</div>
+        <div style="display:flex; gap:8px;">
+          <div style="width:20px;height:1px;background:#bbb;margin-top:4px;"></div>
+        </div>
+      </div>
+      <!-- Hero plein écran -->
+      <div style="flex:1; background: linear-gradient(135deg,#e8d5f0,#d5e8f5); border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.7); box-shadow:0 2px 12px rgba(107,76,122,0.2);"></div>
+        <div style="font-size:10px; color:#6b4c7a; font-style:italic; letter-spacing:1px;">Nouvelle Collection</div>
+        <div style="background:#6b4c7a; color:#fff; font-size:8px; padding:3px 10px; border-radius:10px; letter-spacing:1px;">Découvrir</div>
+      </div>
+      <!-- Scroll hint -->
+      <div style="text-align:center; font-size:8px; color:#bbb;">↓ défiler</div>
+    </div>
+    <div class="card-body">
+      <h3>Hero Immersif</h3>
+      <p>Grande photo/vidéo plein écran avec animation d'entrée spectaculaire. Un seul bijou mis en scène. Effet wow garanti au premier coup d'œil.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="mosaic-produits" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #fdf8ff; height:200px; padding:12px; display:flex; flex-direction:column; gap:6px;">
+      <!-- Nav -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:9px; color:#6b4c7a; letter-spacing:2px;">ÉCLAT</div>
+        <div style="font-size:8px; color:#aaa;">Colliers · Bagues · Bracelets</div>
+      </div>
+      <!-- Mini hero -->
+      <div style="background: linear-gradient(135deg,#f0e8f8,#e8f5f0); height:40px; border-radius:4px; display:flex;align-items:center;justify-content:center;">
+        <div style="font-size:9px; color:#6b4c7a; font-style:italic;">Bijoux d'Auteure — Fait Main</div>
+      </div>
+      <!-- Grille mosaïque -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; flex:1;">
+        <div style="background:linear-gradient(135deg,#f5e8f0,#e8d5e8); border-radius:3px;"></div>
+        <div style="background:linear-gradient(135deg,#e8f0f5,#d5e8f5); border-radius:3px; grid-row:span 2;"></div>
+        <div style="background:linear-gradient(135deg,#f0f5e8,#e5f0d5); border-radius:3px;"></div>
+        <div style="background:linear-gradient(135deg,#f5f0e8,#f0e8d5); border-radius:3px;"></div>
+        <div style="background:linear-gradient(135deg,#f8e8f5,#f0d5e8); border-radius:3px;"></div>
+        <div style="background:linear-gradient(135deg,#e8f5f8,#d5eff5); border-radius:3px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Mosaïque Produits</h3>
+      <p>Grille asymétrique avec tous les bijoux visibles dès l'arrivée. Animations d'apparition en cascade. Les produits sont les stars dès le départ.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="storytelling-scroll" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff8fd; height:200px; padding:12px; display:flex; flex-direction:column; gap:5px; overflow:hidden;">
+      <!-- Nav -->
+      <div style="font-size:9px; color:#6b4c7a; letter-spacing:2px; text-align:center;">ÉCLAT</div>
+      <!-- Sections de scroll simulées -->
+      <div style="background:linear-gradient(135deg,#ede0f5,#ddeaf5); border-radius:4px; height:35px; display:flex;align-items:center;padding:0 8px;">
+        <div style="font-size:8px; color:#6b4c7a; font-style:italic;">L'histoire de la créatrice →</div>
+      </div>
+      <div style="display:flex; gap:4px; height:40px;">
+        <div style="flex:1; background:linear-gradient(135deg,#f5e8f0,#edd5e8); border-radius:4px;"></div>
+        <div style="flex:2; display:flex;flex-direction:column;justify-content:center;padding:4px;">
+          <div style="font-size:7px;color:#888;margin-bottom:2px;">Bague Aurore</div>
+          <div style="width:60%;height:1px;background:#d4a0c8;"></div>
+          <div style="font-size:7px;color:#6b4c7a;margin-top:2px;">38€</div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#e8f0f5,#d5e8f8); border-radius:4px; height:30px; display:flex;align-items:center;padding:0 8px;">
+        <div style="font-size:7px; color:#4a7a8a;">Collections · Témoignages · Instagram</div>
+      </div>
+      <div style="text-align:center; font-size:7px; color:#ccc;">~ parallax scroll ~</div>
+    </div>
+    <div class="card-body">
+      <h3>Storytelling Scroll</h3>
+      <p>Narration visuelle au fil du défilement. L'histoire de la créatrice, puis les pièces. Parallax, effets de révélation. Engagement émotionnel fort.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:20px;font-size:12px;">Ces layouts peuvent se combiner — ex: hero immersif + scroll narratif en dessous. Dis-moi ce qui t'attire.</p>

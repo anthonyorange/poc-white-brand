@@ -1,0 +1,83 @@
+<h2>Quelle direction visuelle pour ton site bijoux ?</h2>
+<p class="subtitle">Chaque style crée une expérience d'achat différente — choisis celui qui correspond le mieux à ton univers de marque</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="luxe-noir" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:16px;">
+      <div style="width:60px;height:1px;background:#c9a84c;"></div>
+      <div style="font-family:'Georgia',serif; color:#c9a84c; font-size:13px; letter-spacing:4px; text-transform:uppercase;">Atelier &amp; Co</div>
+      <div style="width:40px;height:40px;border:1px solid #c9a84c; border-radius:50%; display:flex;align-items:center;justify-content:center;">
+        <div style="width:12px;height:12px;background:#c9a84c;border-radius:50%;"></div>
+      </div>
+      <div style="font-family:'Georgia',serif; color:#888; font-size:10px; letter-spacing:2px;">COLLECTION AUTOMNE</div>
+      <div style="width:60px;height:1px;background:#c9a84c;"></div>
+    </div>
+    <div class="card-body">
+      <h3>Luxe Sombre</h3>
+      <p>Fond noir, or/doré, typographie serif élégante. Animations lentes et fluides. Ambiance haute joaillerie, exclusivité.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="nature-creme" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f5f0e8; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:16px;">
+      <div style="font-family:'Georgia',serif; color:#3d2b1f; font-size:18px; letter-spacing:2px;">Mains d'Or</div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <div style="width:20px;height:1px;background:#8b6b4a;"></div>
+        <div style="width:6px;height:6px;background:#8b6b4a;border-radius:50%;"></div>
+        <div style="width:20px;height:1px;background:#8b6b4a;"></div>
+      </div>
+      <div style="background:#e8ddd0;width:90px;height:70px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="14" stroke="#8b6b4a" stroke-width="1"/>
+          <circle cx="20" cy="20" r="6" fill="#8b6b4a" opacity="0.4"/>
+          <line x1="6" y1="20" x2="34" y2="20" stroke="#8b6b4a" stroke-width="0.8"/>
+        </svg>
+      </div>
+      <div style="font-size:9px; color:#8b6b4a; letter-spacing:3px; text-transform:uppercase;">Fait main avec amour</div>
+    </div>
+    <div class="card-body">
+      <h3>Nature &amp; Artisanat</h3>
+      <p>Tons crème, beige, terre. Textures organiques, animations douces. Ambiance fait-main, chaleureuse, authentique.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="minimal-blanc" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#ffffff; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:16px; border: 1px solid #eee;">
+      <div style="font-family:'Helvetica Neue', sans-serif; color:#111; font-size:16px; font-weight:300; letter-spacing:6px; text-transform:uppercase;">ORJA</div>
+      <div style="width:1px;height:30px;background:#ddd;"></div>
+      <div style="display:flex; gap:8px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:#e8e8e8;"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:#d4d4d4;"></div>
+      </div>
+      <div style="font-size:9px; color:#aaa; letter-spacing:4px; text-transform:uppercase;">Nouvelle Collection</div>
+    </div>
+    <div class="card-body">
+      <h3>Minimaliste Épuré</h3>
+      <p>Blanc, noir, gris. Beaucoup d'espace, micro-animations précises. Style contemporain, intemporel, galerie d'art.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="poetique-couleur" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #f8e8f0 0%, #e8f0f8 50%, #f0f8e8 100%); height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:16px;">
+      <div style="font-family:'Georgia',serif; color:#6b4c7a; font-size:17px; font-style:italic;">Éclat</div>
+      <div style="display:flex; gap:5px;">
+        <div style="width:10px;height:10px;background:#e8a0c0;border-radius:50%;animation:none;"></div>
+        <div style="width:14px;height:14px;background:#a0b8e8;border-radius:50%;"></div>
+        <div style="width:10px;height:10px;background:#b8e8a0;border-radius:50%;"></div>
+        <div style="width:8px;height:8px;background:#e8d0a0;border-radius:50%;"></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.7);padding:8px 16px;border-radius:20px;">
+        <div style="font-size:9px; color:#6b4c7a; letter-spacing:2px; text-transform:uppercase;">Bijoux d'Auteure</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Poétique &amp; Coloré</h3>
+      <p>Pastels doux, dégradés subtils. Animations fluides et oniriques. Ambiance créative, unique, artiste.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:24px; font-size:13px;">Clique sur un style dans le navigateur, ou dis-moi en terminal lequel t'attire — ou si tu vois un mélange qui t'intéresse.</p>

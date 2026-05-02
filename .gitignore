@@ -1,7 +1,5 @@
 # Nuxt dev/build outputs
 .output
-.data
-.nuxt
 .nitro
 .cache
 dist
@@ -29,5 +27,3 @@ logs
 # Local files
 *.local
 
-# Superpowers
-.superpowers/
