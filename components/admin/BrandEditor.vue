@@ -31,12 +31,7 @@
     <AppButton type="submit" variant="primary" :disabled="saving">
       {{ saving ? 'Enregistrement...' : 'Sauvegarder' }}
     </AppButton>
-    <p
-      v-if="saved"
-      role="status"
-      aria-live="polite"
-      class="font-body text-xs text-green-600"
-    >
+    <p v-if="saved" role="status" aria-live="polite" class="font-body text-xs text-green-600">
       Modifications enregistrées ✓
     </p>
   </form>

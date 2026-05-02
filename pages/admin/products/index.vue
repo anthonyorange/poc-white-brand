@@ -77,7 +77,7 @@ const lastDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
 const hasMore = ref(false)
 
 const fetchPage = async (reset: boolean) => {
-  const cursor = reset ? undefined : lastDoc.value ?? undefined
+  const cursor = reset ? undefined : (lastDoc.value ?? undefined)
   try {
     const r = await getAll(cursor)
     if (reset) products.value = r.items

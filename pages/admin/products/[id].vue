@@ -51,8 +51,7 @@ const save = async (data: Omit<Product, 'id'>) => {
     await update(id, data)
     await navigateTo('/admin/products')
   } catch (e) {
-    error.value =
-      e instanceof Error ? e.message : "Impossible d'enregistrer les modifications."
+    error.value = e instanceof Error ? e.message : "Impossible d'enregistrer les modifications."
   } finally {
     loading.value = false
   }

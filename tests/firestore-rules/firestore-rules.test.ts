@@ -21,15 +21,7 @@ import {
   assertFails,
   assertSucceeds,
 } from '@firebase/rules-unit-testing'
-import {
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  addDoc,
-} from 'firebase/firestore'
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc } from 'firebase/firestore'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -93,27 +85,17 @@ describe.skip('Firestore rules', () => {
     })
 
     it('admin (custom claim) can create a valid product', async () => {
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
-      await assertSucceeds(
-        setDoc(doc(admin, 'products/my-ring'), validProduct('my-ring')),
-      )
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
+      await assertSucceeds(setDoc(doc(admin, 'products/my-ring'), validProduct('my-ring')))
     })
 
     it('admin cannot create product with slug != doc id', async () => {
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
-      await assertFails(
-        setDoc(doc(admin, 'products/my-ring'), validProduct('other-slug')),
-      )
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
+      await assertFails(setDoc(doc(admin, 'products/my-ring'), validProduct('other-slug')))
     })
 
     it('admin cannot create product with invalid category', async () => {
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
       await assertFails(
         setDoc(doc(admin, 'products/bad-cat'), {
           ...validProduct('bad-cat'),
@@ -123,9 +105,7 @@ describe.skip('Firestore rules', () => {
     })
 
     it('admin cannot set more than 10 images', async () => {
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
       const images = Array.from({ length: 11 }, (_, i) => `https://e.com/${i}.jpg`)
       await assertFails(
         setDoc(doc(admin, 'products/too-many'), {
@@ -136,12 +116,8 @@ describe.skip('Firestore rules', () => {
     })
 
     it('admin cannot set negative price', async () => {
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
-      await assertFails(
-        setDoc(doc(admin, 'products/neg'), { ...validProduct('neg'), price: -1 }),
-      )
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
+      await assertFails(setDoc(doc(admin, 'products/neg'), { ...validProduct('neg'), price: -1 }))
     })
   })
 
@@ -161,9 +137,7 @@ describe.skip('Firestore rules', () => {
 
     it('anonymous cannot create message with read=true (privilege escalation)', async () => {
       const anon = testEnv.unauthenticatedContext().firestore()
-      await assertFails(
-        addDoc(collection(anon, 'messages'), { ...validMessage(), read: true }),
-      )
+      await assertFails(addDoc(collection(anon, 'messages'), { ...validMessage(), read: true }))
     })
 
     it('anonymous cannot create message with extra fields', async () => {
@@ -188,9 +162,7 @@ describe.skip('Firestore rules', () => {
 
     it('anonymous cannot create empty message', async () => {
       const anon = testEnv.unauthenticatedContext().firestore()
-      await assertFails(
-        addDoc(collection(anon, 'messages'), { ...validMessage(), content: 'hi' }),
-      )
+      await assertFails(addDoc(collection(anon, 'messages'), { ...validMessage(), content: 'hi' }))
     })
 
     it('anonymous cannot read messages', async () => {
@@ -208,9 +180,7 @@ describe.skip('Firestore rules', () => {
         const ref = await addDoc(collection(ctx.firestore(), 'messages'), validMessage())
         id = ref.id
       })
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
       await assertSucceeds(getDoc(doc(admin, `messages/${id}`)))
       await assertSucceeds(updateDoc(doc(admin, `messages/${id}`), { read: true }))
     })
@@ -231,9 +201,7 @@ describe.skip('Firestore rules', () => {
     })
 
     it('admin can write brand config', async () => {
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
       await assertSucceeds(setDoc(doc(admin, 'config/brand'), { name: 'Legit' }))
     })
   })
@@ -243,9 +211,7 @@ describe.skip('Firestore rules', () => {
       await testEnv.withSecurityRulesDisabled(async (ctx) => {
         await setDoc(doc(ctx.firestore(), 'products/to-delete'), validProduct('to-delete'))
       })
-      const admin = testEnv
-        .authenticatedContext('admin1', { admin: true })
-        .firestore()
+      const admin = testEnv.authenticatedContext('admin1', { admin: true }).firestore()
       await assertSucceeds(deleteDoc(doc(admin, 'products/to-delete')))
     })
 

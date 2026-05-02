@@ -41,10 +41,7 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    const [auth, { signOut }] = await Promise.all([
-      useFirebaseAuth(),
-      import('firebase/auth'),
-    ])
+    const [auth, { signOut }] = await Promise.all([useFirebaseAuth(), import('firebase/auth')])
     await signOut(auth)
     await navigateTo('/admin/login')
   }

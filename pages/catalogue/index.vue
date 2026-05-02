@@ -45,9 +45,7 @@ const VALID_CATS: Array<ProductCategory | 'all'> = [
 
 // Sanitize query param. SYM-GR-0003.
 const parseCategory = (raw: unknown): ProductCategory | 'all' =>
-  VALID_CATS.includes(raw as ProductCategory | 'all')
-    ? (raw as ProductCategory | 'all')
-    : 'all'
+  VALID_CATS.includes(raw as ProductCategory | 'all') ? (raw as ProductCategory | 'all') : 'all'
 
 const activeCategory = ref<ProductCategory | 'all'>(parseCategory(route.query.category))
 
@@ -59,9 +57,7 @@ const { data: firstPage } = await useAsyncData(
   async () => {
     try {
       const r =
-        activeCategory.value === 'all'
-          ? await getAll()
-          : await getByCategory(activeCategory.value)
+        activeCategory.value === 'all' ? await getAll() : await getByCategory(activeCategory.value)
       return { items: r.items, lastDocCount: r.items.length }
     } catch {
       return { items: [] as Product[], lastDocCount: 0 }
@@ -76,7 +72,7 @@ const lastDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
 const hasMore = ref(firstPage.value.lastDocCount === PRODUCTS_PAGE_SIZE)
 
 const fetchPage = async (reset: boolean) => {
-  const cursor = reset ? undefined : lastDoc.value ?? undefined
+  const cursor = reset ? undefined : (lastDoc.value ?? undefined)
   try {
     const result =
       activeCategory.value === 'all'
