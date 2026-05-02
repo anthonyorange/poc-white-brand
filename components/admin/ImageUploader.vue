@@ -1,19 +1,22 @@
 <!-- components/admin/ImageUploader.vue -->
 <template>
   <div class="space-y-3">
-    <button
-      type="button"
-      class="focus-ring border-2 border-dashed border-accent/40 rounded-xl p-8 text-center w-full cursor-pointer hover:border-primary/40 transition-colors"
+    <!-- Using a <label> + hidden native <input type=file> is the most
+         reliable way to trigger the file picker across browsers. Clicking
+         the label behaves like clicking the input directly (no programmatic
+         .click() dance, no browser heuristics about "invisible" inputs). -->
+    <label
+      for="image-uploader-input"
+      class="focus-ring border-2 border-dashed border-accent/40 rounded-xl p-8 text-center w-full block cursor-pointer hover:border-primary/40 transition-colors"
       :aria-label="`Uploader des images (${modelValue.length}/${MAX_IMAGES} actuelles)`"
-      @click="fileInput?.click()"
       @dragover.prevent
       @drop.prevent="onDrop"
     >
       <p class="font-body text-sm text-primary/60">Glisser-déposer ou cliquer pour uploader</p>
       <p class="font-body text-xs text-primary/40 mt-1">JPG, PNG, WebP — max 5 Mo par image</p>
-    </button>
+    </label>
     <input
-      ref="fileInput"
+      id="image-uploader-input"
       type="file"
       :accept="ACCEPTED_TYPES.join(',')"
       multiple
@@ -66,7 +69,7 @@
         <img
           :src="p.blobUrl"
           :alt="p.name"
-          class="w-full h-full object-cover rounded-lg opacity-50"
+          class="w-full h-full object-cover rounded-lg opacity-60"
         />
         <div class="absolute inset-0 flex items-center justify-center">
           <span class="text-white text-xs bg-black/60 px-2 py-0.5 rounded">
@@ -97,7 +100,6 @@ interface PendingUpload {
   progress: number
 }
 
-const fileInput = ref<HTMLInputElement>()
 const uploading = ref(false)
 const error = ref('')
 const pending = ref<PendingUpload[]>([])
@@ -154,23 +156,25 @@ const upload = async (files: FileList) => {
 
   uploading.value = true
 
+  // Create local previews IMMEDIATELY (synchronously) so admins see a
+  // thumbnail even while firebase/storage SDK is still loading. This is
+  // especially important on the first upload of a session, where the
+  // dynamic import of firebase/storage can take several seconds.
+  // SYM-GR-0019 UX baseline.
+  const items: Array<PendingUpload & { file: File }> = Array.from(files).map((file) => ({
+    id: crypto.randomUUID(),
+    name: file.name,
+    blobUrl: URL.createObjectURL(file),
+    progress: 0,
+    file,
+  }))
+  for (const it of items) {
+    pending.value.push({ id: it.id, name: it.name, blobUrl: it.blobUrl, progress: 0 })
+  }
+
   try {
     const storage = await useFirebaseStorage()
     const uploadedUrls: string[] = []
-
-    // Create local previews immediately (so admin sees *something* even if
-    // Storage is slow or fails). SYM-GR-0019 UX baseline.
-    const items: Array<PendingUpload & { file: File }> = Array.from(files).map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name,
-      blobUrl: URL.createObjectURL(file),
-      progress: 0,
-      file,
-    }))
-    // Push to `pending` without the File object (Vue reactivity doesn't need it).
-    for (const it of items) {
-      pending.value.push({ id: it.id, name: it.name, blobUrl: it.blobUrl, progress: 0 })
-    }
 
     // Upload items sequentially to keep the UI feedback simple.
     for (const item of items) {
@@ -203,6 +207,13 @@ const upload = async (files: FileList) => {
     const code = (e as { code?: string })?.code ?? ''
     error.value = storageErrorMessage(code)
     if (import.meta.dev) console.error('[ImageUploader] upload failed:', e)
+    // On failure, clean up any still-pending blobs to avoid a zombie UI.
+    for (const it of items) {
+      if (pending.value.find((p) => p.id === it.id)) {
+        URL.revokeObjectURL(it.blobUrl)
+        pending.value = pending.value.filter((p) => p.id !== it.id)
+      }
+    }
   } finally {
     uploading.value = false
   }
@@ -217,12 +228,23 @@ const onImgLoadError = (url: string) => {
 const onFiles = (e: Event) => {
   const input = e.target as HTMLInputElement
   const files = input.files
+  if (import.meta.dev) {
+    console.log(
+      '[ImageUploader] onFiles:',
+      files?.length ?? 0,
+      'file(s) selected',
+      files ? Array.from(files).map((f) => `${f.name} (${f.type}, ${f.size}B)`) : [],
+    )
+  }
   if (files && files.length > 0) upload(files)
   // Reset so the same file can be re-selected later.
   input.value = ''
 }
 
 const onDrop = (e: DragEvent) => {
+  if (import.meta.dev) {
+    console.log('[ImageUploader] onDrop:', e.dataTransfer?.files?.length ?? 0, 'file(s)')
+  }
   if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
     upload(e.dataTransfer.files)
   }
