@@ -22,6 +22,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? '',
+      // reCAPTCHA v3 site key for Firebase App Check. Empty => App Check off.
+      // Create via Firebase console → App Check → Web apps.
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY ?? '',
       firebase: {
         apiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY ?? '',
         authDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? '',
