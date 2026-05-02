@@ -57,8 +57,13 @@ export default defineNuxtConfig({
   // so <NuxtImg> can apply lazy-loading, responsive srcset, and format hints.
   // We don't run an image CDN in this setup, but allowlisting is required by
   // the module; actual serving still goes directly to Firebase Storage URLs.
+  //
+  // images.unsplash.com is included to let tools/seed-data.mjs populate a
+  // demo catalogue with stock photos. Remove it from this list once you
+  // replace seed images with your own Firebase Storage uploads (SYM-GR-0003,
+  // reduces the image-proxy SSRF surface).
   image: {
-    domains: ['firebasestorage.googleapis.com', 'storage.googleapis.com'],
+    domains: ['firebasestorage.googleapis.com', 'storage.googleapis.com', 'images.unsplash.com'],
     format: ['webp', 'avif', 'jpeg'],
     screens: {
       xs: 320,
