@@ -108,6 +108,13 @@ const categories = [
   { name: 'Boucles', slug: 'boucles', icon: '⭐', gradient: 'from-accent/20 to-secondary/20' },
 ]
 
+useSeoMeta({
+  title: () => brand.config.value.texts.heroTitle,
+  description: () => brand.config.value.texts.heroSubtitle,
+  ogTitle: () => `${brand.config.value.name} — ${brand.config.value.slogan}`,
+  ogDescription: () => brand.config.value.texts.heroSubtitle,
+})
+
 onMounted(async () => {
   try {
     featured.value = await getFeatured()

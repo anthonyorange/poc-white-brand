@@ -1,11 +1,26 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-04-03',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxt/eslint'],
+  modules: [
+    '@pinia/nuxt',
+    '@nuxtjs/tailwindcss',
+    '@nuxt/eslint',
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots',
+  ],
   css: ['~/assets/css/tokens.css', '~/assets/css/animations.css'],
+
+  // Public site URL used by @nuxtjs/sitemap and OG tags.
+  // Override via NUXT_PUBLIC_SITE_URL at deploy time.
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL ?? 'https://atelieranais-cb8dd.web.app',
+    name: "L'Atelier d'Anaïs",
+  },
+
   runtimeConfig: {
     public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? '',
       firebase: {
         apiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY ?? '',
         authDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? '',
@@ -17,11 +32,36 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  // Block admin routes from crawlers; allow public pages.
+  robots: {
+    disallow: ['/admin', '/admin/'],
+  },
+
+  // Sitemap excludes admin routes; dynamic product slugs can be added later
+  // via a server handler that queries Firestore at build time.
+  sitemap: {
+    exclude: ['/admin/**'],
+  },
+
   nitro: {
     preset: 'firebase',
     firebase: { gen: 2 },
   },
+
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      ],
+      meta: [
+        { name: 'theme-color', content: '#6b4c7a' },
+        { name: 'format-detection', content: 'telephone=no' },
+      ],
+    },
   },
 })

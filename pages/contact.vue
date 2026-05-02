@@ -54,6 +54,11 @@
 <script setup lang="ts">
 import { addDoc, collection } from 'firebase/firestore'
 
+useSeoMeta({
+  title: 'Contact',
+  description: "Une question, une commande sur mesure ? Contactez l'atelier.",
+})
+
 const db = useFirestore()
 const form = reactive({ name: '', email: '', content: '' })
 const sent = ref(false)

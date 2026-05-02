@@ -66,4 +66,9 @@
 
 <script setup lang="ts">
 const cart = useCart()
+
+useSeoMeta({
+  title: 'Panier',
+  robots: 'noindex', // Pas de contenu indexable sur le panier
+})
 </script>
