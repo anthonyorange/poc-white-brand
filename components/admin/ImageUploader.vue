@@ -156,4 +156,8 @@ const removeImage = (i: number) => {
   updated.splice(i, 1)
   emit('update:modelValue', updated)
 }
+
+// Expose `uploading` so parent forms can disable their submit button while
+// an upload is in progress (prevents creating a product without images).
+defineExpose({ uploading })
 </script>
