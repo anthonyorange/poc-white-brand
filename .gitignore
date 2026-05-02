@@ -31,3 +31,4 @@ logs
 
 # Symbiotic Security - Security Rules (auto-generated)
 .github/instructions/symbiotic_security_rules.instructions.md
+symbiotic.exe

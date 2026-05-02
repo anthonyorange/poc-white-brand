@@ -1,9 +1,10 @@
 <!-- layouts/default.vue -->
 <template>
   <div class="min-h-screen bg-background font-body">
+    <a href="#main-content" class="skip-link">Aller au contenu</a>
     <CustomCursor />
     <AppHeader />
-    <main class="pt-20">
+    <main id="main-content" class="pt-20" tabindex="-1">
       <slot />
     </main>
     <AppFooter />

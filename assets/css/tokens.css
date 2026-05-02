@@ -9,3 +9,48 @@
   --font-heading: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
 }
+
+/* --------- Accessibility utilities --------- */
+
+/* Consistent, visible keyboard focus ring (WCAG 2.4.7). */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Skip link (WCAG 2.4.1 bypass blocks). Visible only on focus. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  z-index: 9999;
+  font-family: var(--font-body);
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 0;
+}
+
+/* Screen-reader-only helper (keeps content in the a11y tree without showing it) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Make the active nav link visually identifiable (vue-router adds
+   .router-link-active automatically). */
+a.router-link-active {
+  color: var(--color-primary);
+}

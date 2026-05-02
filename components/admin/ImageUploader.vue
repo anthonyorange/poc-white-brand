@@ -1,41 +1,56 @@
 <!-- components/admin/ImageUploader.vue -->
 <template>
   <div class="space-y-3">
-    <div
-      class="border-2 border-dashed border-accent/40 rounded-xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors"
+    <button
+      type="button"
+      class="focus-ring border-2 border-dashed border-accent/40 rounded-xl p-8 text-center w-full cursor-pointer hover:border-primary/40 transition-colors"
+      :aria-label="`Uploader des images (${modelValue.length}/${MAX_IMAGES} actuelles)`"
       @click="fileInput?.click()"
       @dragover.prevent
       @drop.prevent="onDrop"
     >
-      <p class="font-body text-sm text-primary/40">Glisser-déposer ou cliquer pour uploader</p>
-      <p class="font-body text-xs text-primary/30 mt-1">JPG, PNG, WebP — max 5 Mo par image</p>
-    </div>
+      <p class="font-body text-sm text-primary/60">Glisser-déposer ou cliquer pour uploader</p>
+      <p class="font-body text-xs text-primary/40 mt-1">JPG, PNG, WebP — max 5 Mo par image</p>
+    </button>
     <input
       ref="fileInput"
       type="file"
       :accept="ACCEPTED_TYPES.join(',')"
       multiple
-      class="hidden"
+      class="sr-only"
       @change="onFiles"
     />
 
-    <div v-if="uploading" class="text-xs font-body text-primary/50 text-center">
+    <div
+      v-if="uploading"
+      role="status"
+      aria-live="polite"
+      class="text-xs font-body text-primary/60 text-center"
+    >
       Upload en cours...
     </div>
-    <p v-if="error" class="text-xs font-body text-red-400 text-center">{{ error }}</p>
+    <p
+      v-if="error"
+      role="alert"
+      aria-live="assertive"
+      class="text-xs font-body text-red-500 text-center"
+    >
+      {{ error }}
+    </p>
 
-    <div v-if="modelValue.length" class="flex flex-wrap gap-2">
-      <div v-for="(url, i) in modelValue" :key="url" class="relative w-20 h-20">
+    <ul v-if="modelValue.length" class="flex flex-wrap gap-2 list-none p-0">
+      <li v-for="(url, i) in modelValue" :key="url" class="relative w-20 h-20">
         <img :src="url" :alt="`Image ${i + 1}`" class="w-full h-full object-cover rounded-lg" />
         <button
           type="button"
-          class="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white rounded-full text-xs flex items-center justify-center"
+          class="focus-ring absolute -top-2 -right-2 w-5 h-5 bg-primary text-white rounded-full text-xs flex items-center justify-center"
+          :aria-label="`Supprimer l'image ${i + 1}`"
           @click="removeImage(i)"
         >
-          ×
+          <span aria-hidden="true">×</span>
         </button>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </template>
 

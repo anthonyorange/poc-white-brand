@@ -24,12 +24,21 @@
       />
     </div>
 
-    <p v-if="error" class="font-body text-sm text-red-400">{{ error }}</p>
+    <p v-if="error" role="alert" aria-live="assertive" class="font-body text-sm text-red-500">
+      {{ error }}
+    </p>
 
     <AppButton type="submit" variant="primary" :disabled="saving">
       {{ saving ? 'Enregistrement...' : 'Sauvegarder' }}
     </AppButton>
-    <p v-if="saved" class="font-body text-xs text-green-500">Modifications enregistrées ✓</p>
+    <p
+      v-if="saved"
+      role="status"
+      aria-live="polite"
+      class="font-body text-xs text-green-600"
+    >
+      Modifications enregistrées ✓
+    </p>
   </form>
 </template>
 

@@ -2,28 +2,43 @@
 <template>
   <div class="min-h-screen bg-background flex items-center justify-center px-6">
     <div class="w-full max-w-sm">
-      <div class="text-center mb-10">
-        <p class="font-heading text-3xl text-primary">Administration</p>
-        <p class="font-body text-sm text-primary/40 mt-2">{{ brand.config.value.name }}</p>
-      </div>
-      <form class="flex flex-col gap-4" @submit.prevent="submit">
-        <input
-          v-model="email"
-          type="email"
-          required
-          autocomplete="username"
-          placeholder="Email"
-          class="border border-accent/40 rounded-xl px-4 py-3 font-body text-sm bg-surface/50 outline-none focus:border-primary transition-colors"
-        />
-        <input
-          v-model="password"
-          type="password"
-          required
-          autocomplete="current-password"
-          placeholder="Mot de passe"
-          class="border border-accent/40 rounded-xl px-4 py-3 font-body text-sm bg-surface/50 outline-none focus:border-primary transition-colors"
-        />
-        <p v-if="error" class="text-red-400 text-xs font-body text-center">{{ error }}</p>
+      <h1 class="text-center mb-10">
+        <span class="font-heading text-3xl text-primary block">Administration</span>
+        <span class="font-body text-sm text-primary/60 block mt-2">
+          {{ brand.config.value.name }}
+        </span>
+      </h1>
+      <form class="flex flex-col gap-4" aria-labelledby="login-title" @submit.prevent="submit">
+        <label class="flex flex-col gap-1">
+          <span class="sr-only">Email</span>
+          <input
+            v-model="email"
+            type="email"
+            required
+            autocomplete="username"
+            placeholder="Email"
+            class="focus-ring border border-accent/40 rounded-xl px-4 py-3 font-body text-sm bg-surface/50 outline-none focus:border-primary transition-colors"
+          />
+        </label>
+        <label class="flex flex-col gap-1">
+          <span class="sr-only">Mot de passe</span>
+          <input
+            v-model="password"
+            type="password"
+            required
+            autocomplete="current-password"
+            placeholder="Mot de passe"
+            class="focus-ring border border-accent/40 rounded-xl px-4 py-3 font-body text-sm bg-surface/50 outline-none focus:border-primary transition-colors"
+          />
+        </label>
+        <p
+          v-if="error"
+          role="alert"
+          aria-live="assertive"
+          class="text-red-500 text-xs font-body text-center"
+        >
+          {{ error }}
+        </p>
         <AppButton type="submit" variant="primary" :disabled="loading">
           {{ loading ? 'Connexion...' : 'Se connecter' }}
         </AppButton>
