@@ -12,6 +12,9 @@ service cloud.firestore {
     }
 
     // Products: public read, admin-only write.
+    // Invariant: doc ID equals the slug (guaranteed by client via setDoc(id=slug)).
+    // We enforce slug regex AND slug == id at the rule level so the URL is
+    // deterministic and collisions are impossible (SYM-GR-0003, SYM-GR-0004).
     match /products/{id} {
       allow read: if true;
       allow create, update: if isAdmin()
@@ -19,6 +22,7 @@ service cloud.firestore {
         && request.resource.data.name.size() <= 120
         && request.resource.data.slug is string
         && request.resource.data.slug.matches('^[a-z0-9-]{1,120}$')
+        && request.resource.data.slug == id
         && request.resource.data.description is string
         && request.resource.data.description.size() <= 4000
         && request.resource.data.price is number

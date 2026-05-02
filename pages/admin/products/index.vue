@@ -3,13 +3,13 @@
   <div>
     <div class="flex justify-between items-center mb-8">
       <h1 class="font-heading text-3xl text-primary">Produits</h1>
-      <AppButton variant="primary" @click="navigateTo('/admin/products/new')"
-        >+ Nouveau produit</AppButton
-      >
+      <AppButton variant="primary" @click="navigateTo('/admin/products/new')">
+        + Nouveau produit
+      </AppButton>
     </div>
 
-    <div class="divide-y divide-accent/20">
-      <div v-for="p in products" :key="p.id" class="flex items-center gap-4 py-4">
+    <ul class="divide-y divide-accent/20 list-none p-0">
+      <li v-for="p in products" :key="p.id" class="flex items-center gap-4 py-4">
         <NuxtImg
           v-if="p.images[0]"
           :src="p.images[0]"
@@ -46,31 +46,63 @@
         >
           Supprimer
         </button>
-      </div>
-    </div>
+      </li>
+    </ul>
 
-    <p v-if="products.length === 0" class="text-center font-body text-primary/30 py-16">
+    <p v-if="products.length === 0 && !loading" class="text-center font-body text-primary/60 py-16">
       Aucun produit. Créez-en un !
     </p>
+
+    <div v-if="hasMore" class="flex justify-center mt-6">
+      <AppButton variant="outline" :disabled="loadingMore" @click="loadMore">
+        {{ loadingMore ? 'Chargement...' : 'Charger plus' }}
+      </AppButton>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
+import type { Product } from '~/composables/useProducts'
+import { PRODUCTS_PAGE_SIZE } from '~/composables/useProducts'
+
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const { getAll, remove } = useProducts()
-const products = ref<Awaited<ReturnType<typeof getAll>>>([])
+
+const products = ref<Product[]>([])
+const loading = ref(true)
+const loadingMore = ref(false)
+const lastDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
+const hasMore = ref(false)
+
+const fetchPage = async (reset: boolean) => {
+  const cursor = reset ? undefined : lastDoc.value ?? undefined
+  try {
+    const r = await getAll(cursor)
+    if (reset) products.value = r.items
+    else products.value.push(...r.items)
+    lastDoc.value = r.lastDoc
+    hasMore.value = r.items.length === PRODUCTS_PAGE_SIZE
+  } catch {
+    if (reset) products.value = []
+  }
+}
+
+const loadMore = async () => {
+  if (!hasMore.value || loadingMore.value) return
+  loadingMore.value = true
+  await fetchPage(false)
+  loadingMore.value = false
+}
 
 onMounted(async () => {
-  try {
-    products.value = await getAll()
-  } catch {
-    products.value = []
-  }
+  await fetchPage(true)
+  loading.value = false
 })
 
 const deleteProduct = async (id: string) => {
-  if (!confirm('Supprimer ce produit ?')) return
+  if (!confirm('Supprimer ce produit et ses images ?')) return
   try {
     await remove(id)
     products.value = products.value.filter((p) => p.id !== id)

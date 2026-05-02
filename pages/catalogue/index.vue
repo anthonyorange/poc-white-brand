@@ -3,7 +3,7 @@
   <div class="max-w-5xl mx-auto px-6 py-12">
     <RevealOnScroll>
       <h1 class="font-heading text-5xl text-primary text-center mb-4">Collection</h1>
-      <p class="font-body text-primary/50 text-center mb-10">
+      <p class="font-body text-primary/60 text-center mb-10">
         {{ products.length }} pièce{{ products.length > 1 ? 's' : '' }}
       </p>
     </RevealOnScroll>
@@ -12,17 +12,25 @@
       <CategoryFilter v-model="activeCategory" />
     </div>
 
-    <ProductGrid v-if="filtered.length" :products="filtered" />
-    <p v-else class="text-center font-body text-primary/40 py-20">
+    <ProductGrid v-if="products.length" :products="products" />
+    <p v-else-if="!pending" class="text-center font-body text-primary/60 py-20">
       Aucun bijou dans cette catégorie pour le moment.
     </p>
+
+    <div v-if="hasMore" class="flex justify-center mt-10">
+      <AppButton variant="outline" :disabled="loadingMore" @click="loadMore">
+        {{ loadingMore ? 'Chargement...' : 'Voir plus' }}
+      </AppButton>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ProductCategory } from '~/composables/useProducts'
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
+import type { ProductCategory, Product } from '~/composables/useProducts'
+import { PRODUCTS_PAGE_SIZE } from '~/composables/useProducts'
 
-const { getAll } = useProducts()
+const { getAll, getByCategory } = useProducts()
 const route = useRoute()
 const router = useRouter()
 const brand = useBrand()
@@ -35,37 +43,59 @@ const VALID_CATS: Array<ProductCategory | 'all'> = [
   'boucles',
 ]
 
-// Sanitize query param to prevent reflected values from being used blindly.
-// SYM-GR-0003 (input validation).
-const parseCategory = (raw: unknown): ProductCategory | 'all' => {
-  return VALID_CATS.includes(raw as ProductCategory | 'all')
+// Sanitize query param. SYM-GR-0003.
+const parseCategory = (raw: unknown): ProductCategory | 'all' =>
+  VALID_CATS.includes(raw as ProductCategory | 'all')
     ? (raw as ProductCategory | 'all')
     : 'all'
-}
 
 const activeCategory = ref<ProductCategory | 'all'>(parseCategory(route.query.category))
-const products = ref<Awaited<ReturnType<typeof getAll>>>([])
+const products = ref<Product[]>([])
+const pending = ref(true)
+const loadingMore = ref(false)
+const lastDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
+const hasMore = ref(false)
 
-const filtered = computed(() =>
-  activeCategory.value === 'all'
-    ? products.value
-    : products.value.filter((p) => p.category === activeCategory.value),
-)
+const fetchPage = async (reset: boolean) => {
+  const cursor = reset ? undefined : lastDoc.value ?? undefined
+  try {
+    const result =
+      activeCategory.value === 'all'
+        ? await getAll(cursor)
+        : await getByCategory(activeCategory.value, cursor)
+    if (reset) products.value = result.items
+    else products.value.push(...result.items)
+    lastDoc.value = result.lastDoc
+    hasMore.value = result.items.length === PRODUCTS_PAGE_SIZE
+  } catch {
+    if (reset) products.value = []
+  }
+}
+
+const loadMore = async () => {
+  if (!hasMore.value || loadingMore.value) return
+  loadingMore.value = true
+  await fetchPage(false)
+  loadingMore.value = false
+}
 
 onMounted(async () => {
-  try {
-    products.value = await getAll()
-  } catch {
-    products.value = []
-  }
+  await fetchPage(true)
+  pending.value = false
 })
 
-watch(activeCategory, (cat) => {
+watch(activeCategory, async (cat) => {
   router.replace({ query: cat !== 'all' ? { category: cat } : {} })
+  pending.value = true
+  lastDoc.value = null
+  hasMore.value = false
+  await fetchPage(true)
+  pending.value = false
 })
 
 useSeoMeta({
-  title: 'Collection — ' + brand.config.value.name,
-  description: 'Découvrez tous les bijoux faits main.',
+  title: 'Collection',
+  description: () =>
+    `Découvrez tous les bijoux faits main de ${brand.config.value.name}.`,
 })
 </script>
