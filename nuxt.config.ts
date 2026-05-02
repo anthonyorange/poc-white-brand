@@ -12,6 +12,11 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/tokens.css', '~/assets/css/animations.css'],
 
+  // Auto-import components from all sub-directories (animations/, layout/,
+  // jewelry/, ui/, admin/). pathPrefix:false keeps short names like
+  // <AppHeader> rather than <LayoutAppHeader>.
+  components: [{ path: '~/components', pathPrefix: false }],
+
   // Public site URL used by @nuxtjs/sitemap and OG tags.
   // Override via NUXT_PUBLIC_SITE_URL at deploy time.
   site: {
