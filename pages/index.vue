@@ -98,7 +98,6 @@
 <script setup lang="ts">
 const brand = useBrand()
 const { getFeatured } = useProducts()
-const featured = ref<Awaited<ReturnType<typeof getFeatured>>>([])
 const heroImage = ref('')
 
 const categories = [
@@ -108,19 +107,25 @@ const categories = [
   { name: 'Boucles', slug: 'boucles', icon: '⭐', gradient: 'from-accent/20 to-secondary/20' },
 ]
 
+// SSR-ready: useAsyncData runs on the server first (producing indexable HTML),
+// hydrates the client, and dedupes across navigations.
+// SYM-GR-0010: silent fallback to [] prevents leaking backend errors.
+const { data: featured } = await useAsyncData(
+  'home-featured',
+  async () => {
+    try {
+      return await getFeatured()
+    } catch {
+      return []
+    }
+  },
+  { default: () => [] },
+)
+
 useSeoMeta({
   title: () => brand.config.value.texts.heroTitle,
   description: () => brand.config.value.texts.heroSubtitle,
   ogTitle: () => `${brand.config.value.name} — ${brand.config.value.slogan}`,
   ogDescription: () => brand.config.value.texts.heroSubtitle,
-})
-
-onMounted(async () => {
-  try {
-    featured.value = await getFeatured()
-  } catch {
-    // Avoid leaking backend errors to users. SYM-GR-0010.
-    featured.value = []
-  }
 })
 </script>
